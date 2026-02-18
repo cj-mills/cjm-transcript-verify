@@ -12,11 +12,13 @@ pip install cjm_transcript_verify
 ## Project Structure
 
     nbs/
-    ├── html_ids.ipynb # HTML ID constants for Phase 4: Verify
-    ├── models.ipynb   # Verify step state and verification result models for Phase 4: Verify
-    └── utils.ipynb    # Formatting utilities for verification display
+    ├── services/ (1)
+    │   └── verify.ipynb  # Service layer for querying graph database and computing verification results
+    ├── html_ids.ipynb  # HTML ID constants for Phase 4: Verify
+    ├── models.ipynb    # Verify step state and verification result models for Phase 4: Verify
+    └── utils.ipynb     # Formatting utilities for verification display
 
-Total: 3 notebooks across 3 directories
+Total: 4 notebooks across 3 directories
 
 ## Module Dependencies
 
@@ -24,10 +26,14 @@ Total: 3 notebooks across 3 directories
 graph LR
     html_ids[html_ids<br/>html_ids]
     models[models<br/>models]
+    services_verify[services.verify<br/>services.verify]
     utils[utils<br/>utils]
+
+    services_verify --> models
+    services_verify --> utils
 ```
 
-No cross-module dependencies detected.
+*2 cross-module dependencies detected*
 
 ## CLI Reference
 
@@ -182,4 +188,92 @@ def truncate_text(
     max_length: int = 60  # Maximum length before truncation
 ) -> str:  # Truncated text with ellipsis if needed
     "Truncate text for sample segment display."
+```
+
+### services.verify (`verify.ipynb`)
+
+> Service layer for querying graph database and computing verification
+> results
+
+#### Import
+
+``` python
+from cjm_transcript_verify.services.verify import (
+    DEBUG_VERIFY_SERVICE,
+    VerifyService
+)
+```
+
+#### Classes
+
+``` python
+class VerifyService:
+    def __init__(
+        self,
+        plugin_manager: PluginManager,  # Plugin manager for accessing graph plugin
+        plugin_name: str = "cjm-graph-plugin-sqlite",  # Name of the graph plugin
+    )
+    "Service for querying graph database and computing verification results."
+    
+    def __init__(
+            self,
+            plugin_manager: PluginManager,  # Plugin manager for accessing graph plugin
+            plugin_name: str = "cjm-graph-plugin-sqlite",  # Name of the graph plugin
+        )
+        "Initialize with plugin manager."
+    
+    def is_available(self) -> bool:  # True if plugin is loaded and ready
+            """Check if the graph plugin is available."""
+            return self._manager.get_plugin(self._plugin_name) is not None
+        
+        async def _get_context_async(
+            self,
+            node_id: str,  # UUID of the node to query
+            depth: int = 1,  # Traversal depth
+        ) -> Optional[GraphContext]:  # GraphContext or None if error
+        "Check if the graph plugin is available."
+    
+    async def verify_document_async(
+            self,
+            document_id: str,  # UUID of the Document node to verify
+        ) -> Optional[VerificationResult]:  # Verification results or None if error/not found
+        "Query graph and compute verification results for a document."
+    
+    def verify_document(
+            self,
+            document_id: str,  # UUID of the Document node to verify
+        ) -> Optional[VerificationResult]:  # Verification results or None if error/not found
+        "Query graph and compute verification results for a document synchronously."
+    
+    async def get_segment_by_index_async(
+            self,
+            document_id: str,  # UUID of the Document node
+            index: int,  # Segment index to fetch
+        ) -> Optional[SegmentSample]:  # Segment sample or None if error/not found
+        "Fetch a single segment by index for jump-to-index feature."
+    
+    def get_segment_by_index(
+            self,
+            document_id: str,  # UUID of the Document node
+            index: int,  # Segment index to fetch
+        ) -> Optional[SegmentSample]:  # Segment sample or None if error/not found
+        "Fetch a single segment by index for jump-to-index feature synchronously."
+    
+    async def get_segment_count_async(
+            self,
+            document_id: str,  # UUID of the Document node
+        ) -> int:  # Number of segments or 0 if error
+        "Get total segment count for index validation."
+    
+    def get_segment_count(
+            self,
+            document_id: str,  # UUID of the Document node
+        ) -> int:  # Number of segments or 0 if error
+        "Get total segment count for index validation synchronously."
+```
+
+#### Variables
+
+``` python
+DEBUG_VERIFY_SERVICE = False  # Enable for verbose graph query logging
 ```
