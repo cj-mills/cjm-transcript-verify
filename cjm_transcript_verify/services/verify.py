@@ -78,8 +78,10 @@ class VerifyService:
                 print(f"[VerifyService] Plugin {self._plugin_name} not available")
             return None
         
-        # Get context with depth 1 to get Document + all connected Segments
-        context = await self._get_context_async(document_id, depth=1)
+        # Get context with depth 2 to get Document + Segments + NEXT edges between segments
+        # depth=1 only finds edges directly connected to the Document (STARTS_WITH, PART_OF)
+        # depth=2 also finds edges between the discovered Segments (NEXT)
+        context = await self._get_context_async(document_id, depth=2)
         
         if context is None:
             return None

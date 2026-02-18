@@ -118,6 +118,7 @@ def render_jump_to_index(
                 id=VerifyHtmlIds.JUMP_BUTTON,
                 cls=combine_classes(btn, btn_colors.primary, btn_sizes.sm)
             ),
+            method="post",
             cls=combine_classes(flex_display, items.center, gap(2)),
             **form_attrs
         ),
