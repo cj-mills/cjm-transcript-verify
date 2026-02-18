@@ -7,9 +7,10 @@ Run with: python demo_app.py
 """
 
 from pathlib import Path
+import asyncio
 
 from fasthtml.common import (
-    fast_app, Div, H1, H2, P, Span,
+    fast_app, Div, H1, P, Span,
     APIRouter,
 )
 
@@ -21,12 +22,11 @@ from cjm_plugin_system.core.scheduling import SafetyScheduler
 from cjm_fasthtml_daisyui.core.resources import get_daisyui_headers
 from cjm_fasthtml_daisyui.core.testing import create_theme_persistence_script
 from cjm_fasthtml_daisyui.components.data_display.badge import badge, badge_styles, badge_sizes
-from cjm_fasthtml_daisyui.components.data_display.card import card, card_body
-from cjm_fasthtml_daisyui.utilities.semantic_colors import bg_dui, text_dui
+from cjm_fasthtml_daisyui.utilities.semantic_colors import text_dui
 
 # Tailwind utilities
 from cjm_fasthtml_tailwind.utilities.spacing import p, m
-from cjm_fasthtml_tailwind.utilities.sizing import w, h, container, max_w
+from cjm_fasthtml_tailwind.utilities.sizing import h, container, max_w
 from cjm_fasthtml_tailwind.utilities.typography import font_size, font_weight
 from cjm_fasthtml_tailwind.utilities.flexbox_and_grid import (
     flex_display, flex_direction, justify, items, gap,
@@ -37,12 +37,15 @@ from cjm_fasthtml_tailwind.core.base import combine_classes
 from cjm_fasthtml_app_core.core.routing import register_routes
 from cjm_fasthtml_app_core.core.htmx import handle_htmx_request
 
-# Library imports (will add more as phases progress)
+# Library imports
 from cjm_transcript_verify.html_ids import VerifyHtmlIds
+from cjm_transcript_verify.models import VerifyUrls, VerificationResult
+from cjm_transcript_verify.services.verify import VerifyService
+from cjm_transcript_verify.components.step_renderer import render_verify_step
 
 
 # =============================================================================
-# Test Data Path
+# Test Data
 # =============================================================================
 
 # Path to test graph database
@@ -50,52 +53,150 @@ TEST_GRAPH_DB = Path(__file__).parent / "test_files" / "graph.db"
 
 
 # =============================================================================
+# Async Helpers
+# =============================================================================
+
+async def find_and_verify_document(verify_service):
+    """Find first Document node and verify it in a single async context."""
+    if not verify_service.is_available():
+        return None, None
+
+    try:
+        # Find Document nodes using find_nodes_by_label action
+        result = await verify_service._manager.execute_plugin_async(
+            verify_service._plugin_name,
+            action="find_nodes_by_label",
+            label="Document",
+            limit=1,
+        )
+
+        # Result format: {"nodes": [...], "count": N}
+        nodes = result.get("nodes", [])
+        if not nodes or len(nodes) == 0:
+            return None, None
+
+        document_id = nodes[0].get("id")
+        if not document_id:
+            return None, None
+
+        # Verify the document
+        verification_result = await verify_service.verify_document_async(document_id)
+        return document_id, verification_result
+
+    except Exception as e:
+        print(f"[Demo] Error: {e}")
+        return None, None
+
+
+def run_async(coro):
+    """Run an async coroutine from sync context, creating a fresh event loop."""
+    loop = asyncio.new_event_loop()
+    try:
+        return loop.run_until_complete(coro)
+    finally:
+        loop.close()
+
+
+# =============================================================================
 # Demo Page Renderer
 # =============================================================================
 
-def render_demo_page(plugin_loaded: bool):
-    """Create the demo page content."""
+def render_demo_page(verify_service, urls):
+    """Create the demo page content with verification dashboard."""
 
-    # Status badge
-    if plugin_loaded:
-        status_badge = Span(
-            "Plugin Loaded",
-            cls=combine_classes(badge, badge_styles.outline, badge_sizes.sm, "badge-success")
-        )
-    else:
-        status_badge = Span(
-            "Plugin Not Loaded",
-            cls=combine_classes(badge, badge_styles.outline, badge_sizes.sm, "badge-error")
-        )
-
-    # Placeholder content card
-    placeholder_card = Div(
-        Div(
-            H2(
-                "Verification Dashboard",
-                cls=combine_classes(font_size.xl, font_weight.semibold, m.b(2))
+    if not verify_service.is_available():
+        return Div(
+            # Header
+            Div(
+                H1("Verify Demo", cls=combine_classes(font_size._3xl, font_weight.bold)),
+                Span(
+                    "Plugin Not Available",
+                    cls=combine_classes(badge, badge_styles.outline, badge_sizes.sm, "badge-error")
+                ),
+                cls=combine_classes(flex_display, justify.between, items.center, m.b(4))
             ),
             P(
-                "This is a placeholder for the verification dashboard. "
-                "Components will be added in Phase 3.",
-                cls=combine_classes(text_dui.base_content.opacity(70))
+                "The graph plugin is not available. Please check plugin configuration.",
+                cls=combine_classes(text_dui.base_content.opacity(70), m.b(6))
             ),
+            P(
+                f"Graph DB: {TEST_GRAPH_DB}",
+                cls=combine_classes(font_size.sm, text_dui.base_content.opacity(60))
+            ),
+            P(
+                f"Exists: {TEST_GRAPH_DB.exists()}",
+                cls=combine_classes(font_size.sm, text_dui.base_content.opacity(60))
+            ),
+            id=VerifyHtmlIds.VERIFY_CONTAINER,
+            cls=combine_classes(
+                container, max_w._4xl, m.x.auto,
+                h.full, flex_display, flex_direction.col,
+                p(4), gap(4)
+            )
+        )
+
+    # Find Document and verify it in a single async call
+    document_id, result = run_async(find_and_verify_document(verify_service))
+
+    if not document_id:
+        return Div(
+            # Header
             Div(
-                P(f"Graph DB: {TEST_GRAPH_DB}", cls=str(font_size.sm)),
-                P(f"Exists: {TEST_GRAPH_DB.exists()}", cls=str(font_size.sm)),
-                cls=combine_classes(m.t(4), p(3), bg_dui.base_200, "rounded-lg", font_size.sm)
+                H1("Verify Demo", cls=combine_classes(font_size._3xl, font_weight.bold)),
+                Span(
+                    "No Document Found",
+                    cls=combine_classes(badge, badge_styles.outline, badge_sizes.sm, "badge-warning")
+                ),
+                cls=combine_classes(flex_display, justify.between, items.center, m.b(4))
             ),
-            cls=str(card_body)
-        ),
-        id=VerifyHtmlIds.VERIFY_CONTENT,
-        cls=combine_classes(card, bg_dui.base_100, "shadow-lg")
-    )
+            P(
+                "No Document node found in the graph database. "
+                "Please run the cjm-transcript-review demo first to create test data.",
+                cls=combine_classes(text_dui.base_content.opacity(70), m.b(6))
+            ),
+            P(
+                f"Graph DB: {TEST_GRAPH_DB}",
+                cls=combine_classes(font_size.sm, text_dui.base_content.opacity(60))
+            ),
+            id=VerifyHtmlIds.VERIFY_CONTAINER,
+            cls=combine_classes(
+                container, max_w._4xl, m.x.auto,
+                h.full, flex_display, flex_direction.col,
+                p(4), gap(4)
+            )
+        )
+
+    if result is None:
+        return Div(
+            # Header
+            Div(
+                H1("Verify Demo", cls=combine_classes(font_size._3xl, font_weight.bold)),
+                Span(
+                    "Verification Failed",
+                    cls=combine_classes(badge, badge_styles.outline, badge_sizes.sm, "badge-error")
+                ),
+                cls=combine_classes(flex_display, justify.between, items.center, m.b(4))
+            ),
+            P(
+                f"Failed to verify document {document_id[:12]}...",
+                cls=combine_classes(text_dui.base_content.opacity(70), m.b(6))
+            ),
+            id=VerifyHtmlIds.VERIFY_CONTAINER,
+            cls=combine_classes(
+                container, max_w._4xl, m.x.auto,
+                h.full, flex_display, flex_direction.col,
+                p(4), gap(4)
+            )
+        )
 
     return Div(
         # Header
         Div(
             H1("Verify Demo", cls=combine_classes(font_size._3xl, font_weight.bold)),
-            status_badge,
+            Span(
+                "Plugin Loaded",
+                cls=combine_classes(badge, badge_styles.outline, badge_sizes.sm, "badge-success")
+            ),
             cls=combine_classes(flex_display, justify.between, items.center, m.b(4))
         ),
         P(
@@ -103,13 +204,11 @@ def render_demo_page(plugin_loaded: bool):
             cls=combine_classes(text_dui.base_content.opacity(70), m.b(6))
         ),
 
-        # Content area
-        placeholder_card,
+        # Verification dashboard
+        render_verify_step(result=result, urls=urls),
 
-        id=VerifyHtmlIds.VERIFY_CONTAINER,
         cls=combine_classes(
-            container, max_w._4xl, m.x.auto,
-            h.full,
+            container, max_w._5xl, m.x.auto,
             flex_display, flex_direction.col,
             p(4), gap(4)
         )
@@ -175,12 +274,20 @@ def main():
     print(f"  Test database exists: {TEST_GRAPH_DB.exists()}")
 
     # -------------------------------------------------------------------------
+    # Create VerifyService
+    # -------------------------------------------------------------------------
+    verify_service = VerifyService(plugin_manager, graph_plugin_name)
+
+    # Create URL bundle (no routes wired for demo)
+    urls = VerifyUrls()
+
+    # -------------------------------------------------------------------------
     # Page routes
     # -------------------------------------------------------------------------
     @router
     def index(request, sess):
         """Demo homepage."""
-        return handle_htmx_request(request, lambda: render_demo_page(plugin_loaded))
+        return handle_htmx_request(request, lambda: render_demo_page(verify_service, urls))
 
     # -------------------------------------------------------------------------
     # Register routes

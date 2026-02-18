@@ -12,28 +12,69 @@ pip install cjm_transcript_verify
 ## Project Structure
 
     nbs/
+    ├── components/ (5)
+    │   ├── helpers.ipynb               # State getters for the verify step from InteractionContext
+    │   ├── integrity_checks.ipynb      # Integrity check display with pass/fail indicators
+    │   ├── sample_segments.ipynb       # Sample segment display with first/last segments and jump-to-index
+    │   ├── step_renderer.ipynb         # Main verify step renderer combining all dashboard components
+    │   └── verification_summary.ipynb  # Summary cards for document info, segments stats, and source info
+    ├── routes/ (3)
+    │   ├── core.ipynb    # Verify step state management helpers for routes
+    │   ├── init.ipynb    # Router assembly for Phase 4 verify routes
+    │   └── verify.ipynb  # Verification route that queries graph and computes results
     ├── services/ (1)
     │   └── verify.ipynb  # Service layer for querying graph database and computing verification results
     ├── html_ids.ipynb  # HTML ID constants for Phase 4: Verify
     ├── models.ipynb    # Verify step state and verification result models for Phase 4: Verify
     └── utils.ipynb     # Formatting utilities for verification display
 
-Total: 4 notebooks across 3 directories
+Total: 12 notebooks across 3 directories
 
 ## Module Dependencies
 
 ``` mermaid
 graph LR
+    components_helpers[components.helpers<br/>helpers]
+    components_integrity_checks[components.integrity_checks<br/>integrity_checks]
+    components_sample_segments[components.sample_segments<br/>sample_segments]
+    components_step_renderer[components.step_renderer<br/>step_renderer]
+    components_verification_summary[components.verification_summary<br/>verification_summary]
     html_ids[html_ids<br/>html_ids]
     models[models<br/>models]
+    routes_core[routes.core<br/>core]
+    routes_init[routes.init<br/>init]
+    routes_verify[routes.verify<br/>verify]
     services_verify[services.verify<br/>services.verify]
     utils[utils<br/>utils]
 
-    services_verify --> models
+    components_helpers --> models
+    components_integrity_checks --> html_ids
+    components_integrity_checks --> models
+    components_sample_segments --> html_ids
+    components_sample_segments --> models
+    components_sample_segments --> utils
+    components_step_renderer --> html_ids
+    components_step_renderer --> models
+    components_step_renderer --> components_verification_summary
+    components_step_renderer --> components_sample_segments
+    components_step_renderer --> components_integrity_checks
+    components_verification_summary --> html_ids
+    components_verification_summary --> utils
+    components_verification_summary --> models
+    routes_core --> models
+    routes_init --> routes_core
+    routes_init --> routes_verify
+    routes_init --> models
+    routes_init --> services_verify
+    routes_verify --> routes_core
+    routes_verify --> components_step_renderer
+    routes_verify --> models
+    routes_verify --> services_verify
     services_verify --> utils
+    services_verify --> models
 ```
 
-*2 cross-module dependencies detected*
+*25 cross-module dependencies detected*
 
 ## CLI Reference
 
@@ -42,6 +83,120 @@ No CLI commands found in this project.
 ## Module Overview
 
 Detailed documentation for each module in the project:
+
+### core (`core.ipynb`)
+
+> Verify step state management helpers for routes
+
+#### Import
+
+``` python
+from cjm_transcript_verify.routes.core import (
+    WorkflowStateStore,
+    DEBUG_VERIFY_STATE,
+    VerifyContext
+)
+```
+
+#### Functions
+
+``` python
+def _get_verify_state(
+    state_store:WorkflowStateStore,  # The workflow state store
+    workflow_id:str,  # The workflow identifier
+    session_id:str  # Session identifier string
+) -> VerifyStepState:  # Verify step state dictionary
+    "Get the verify step state from the workflow state store."
+```
+
+``` python
+def _get_review_state(
+    state_store:WorkflowStateStore,  # The workflow state store
+    workflow_id:str,  # The workflow identifier
+    session_id:str  # Session identifier string
+) -> Dict[str, Any]:  # Review step state dictionary
+    "Get the review step state (for document_id fallback)."
+```
+
+``` python
+def _load_verify_context(
+    state_store:WorkflowStateStore,  # The workflow state store
+    workflow_id:str,  # The workflow identifier
+    session_id:str  # Session identifier string
+) -> VerifyContext:  # Common verify state values
+    "Load commonly-needed verify state values with review fallback."
+```
+
+``` python
+def _update_verify_state(
+    state_store:WorkflowStateStore,  # The workflow state store
+    workflow_id:str,  # The workflow identifier
+    session_id:str,  # Session identifier string
+    document_id:str=None,  # Document ID (None = don't change)
+    media_path:str=None,  # Media path (None = don't change)
+) -> None
+    "Update the verify step state in the workflow state store."
+```
+
+#### Classes
+
+``` python
+class VerifyContext(NamedTuple):
+    "Common verify state values loaded by handlers."
+```
+
+#### Variables
+
+``` python
+DEBUG_VERIFY_STATE = False
+```
+
+### helpers (`helpers.ipynb`)
+
+> State getters for the verify step from InteractionContext
+
+#### Import
+
+``` python
+from cjm_transcript_verify.components.helpers import *
+```
+
+#### Functions
+
+``` python
+def _get_verify_state(
+    ctx:InteractionContext  # Interaction context with state
+) -> VerifyStepState:  # Typed verify step state
+    "Get the full verify step state from context."
+```
+
+``` python
+def _get_document_id(
+    ctx:InteractionContext  # Interaction context with state
+) -> Optional[str]:  # Document UUID or None if not set
+    "Get the document ID to verify from context."
+```
+
+``` python
+def _get_media_path(
+    ctx:InteractionContext  # Interaction context with state
+) -> Optional[str]:  # Media path or None if not set
+    "Get the media path for display context."
+```
+
+``` python
+def _get_document_id_from_review(
+    ctx:InteractionContext  # Interaction context with state
+) -> Optional[str]:  # Document UUID or None if not found
+    "Get the document ID from review step state (fallback)."
+```
+
+``` python
+def _get_document_id_any(
+    ctx:InteractionContext  # Interaction context with state
+) -> Optional[str]:  # Document UUID or None if not found anywhere
+    "Get document ID from verify state, falling back to review state."
+```
 
 ### html_ids (`html_ids.ipynb`)
 
@@ -65,6 +220,60 @@ class VerifyHtmlIds:
             id_str: str  # The HTML ID to convert
         ) -> str:  # CSS selector with # prefix
         "Convert an ID to a CSS selector format."
+```
+
+### init (`init.ipynb`)
+
+> Router assembly for Phase 4 verify routes
+
+#### Import
+
+``` python
+from cjm_transcript_verify.routes.init import (
+    init_verify_routers
+)
+```
+
+#### Functions
+
+``` python
+def init_verify_routers(
+    state_store:WorkflowStateStore,  # The workflow state store
+    workflow_id:str,  # The workflow identifier
+    prefix:str,  # Base prefix for verify routes (e.g., "/workflow/verify")
+    verify_service:VerifyService,  # Service for graph queries
+) -> Tuple[List[APIRouter], VerifyUrls, Dict[str, Callable]]:  # (routers, urls, routes)
+    "Initialize and return all verify routers with URL bundle."
+```
+
+### integrity_checks (`integrity_checks.ipynb`)
+
+> Integrity check display with pass/fail indicators
+
+#### Import
+
+``` python
+from cjm_transcript_verify.components.integrity_checks import (
+    render_integrity_checks
+)
+```
+
+#### Functions
+
+``` python
+def _render_check_row(
+    passed:bool,  # Whether the check passed
+    label:str,  # Check description
+    detail:str="",  # Optional detail (e.g., "246/246")
+) -> Any:  # Check row element
+    "Render an integrity check row with pass/fail icon."
+```
+
+``` python
+def render_integrity_checks(
+    result:VerificationResult,  # Verification result with integrity data
+) -> Any:  # Integrity checks card
+    "Render the structure integrity checks section."
 ```
 
 ### models (`models.ipynb`)
@@ -143,6 +352,116 @@ class VerifyUrls:
     sample: str = ''  # Jump-to-index sample fetch route
 ```
 
+### sample_segments (`sample_segments.ipynb`)
+
+> Sample segment display with first/last segments and jump-to-index
+
+#### Import
+
+``` python
+from cjm_transcript_verify.components.sample_segments import (
+    render_sample_row,
+    render_sample_list,
+    render_jump_to_index,
+    render_jump_result,
+    render_sample_segments
+)
+```
+
+#### Functions
+
+``` python
+def render_sample_row(
+    sample:SegmentSample,  # Segment sample to display
+) -> Any:  # Sample row element
+    "Render a single segment sample row."
+```
+
+``` python
+def render_sample_list(
+    samples:List[SegmentSample],  # Samples to display
+    label:str,  # Label for this list (e.g., "First", "Last")
+    container_id:str="",  # Optional container ID
+) -> Any:  # Sample list element
+    "Render a list of segment samples with label."
+```
+
+``` python
+def render_jump_to_index(
+    urls:VerifyUrls=None,  # URL bundle for routes (Phase 4)
+    max_index:int=0,  # Maximum valid index for placeholder
+) -> Any:  # Jump-to-index form
+    "Render the jump-to-index input form."
+```
+
+``` python
+def render_jump_result(
+    sample:Optional[SegmentSample]=None,  # Fetched sample or None
+    error:str="",  # Error message if any
+) -> Any:  # Jump result display
+    "Render the jump-to-index result (single segment or error)."
+```
+
+``` python
+def render_sample_segments(
+    result:VerificationResult,  # Verification result with samples
+    urls:VerifyUrls=None,  # URL bundle for routes
+) -> Any:  # Sample segments card
+    "Render the full sample segments section."
+```
+
+### step_renderer (`step_renderer.ipynb`)
+
+> Main verify step renderer combining all dashboard components
+
+#### Import
+
+``` python
+from cjm_transcript_verify.components.step_renderer import (
+    DEBUG_VERIFY_RENDER,
+    render_verify_header,
+    render_verify_error,
+    render_verify_loading,
+    render_verify_step
+)
+```
+
+#### Functions
+
+``` python
+def render_verify_header(
+    all_passed:bool,  # Whether all integrity checks passed
+) -> Any:  # Header element with title and status badge
+    "Render the verify step header with status badge."
+```
+
+``` python
+def render_verify_error(
+    message:str="Unable to load verification data",  # Error message
+) -> Any:  # Error display element
+    "Render an error state for the verify step."
+```
+
+``` python
+def render_verify_loading() -> Any:  # Loading indicator
+    "Render a loading state for the verify step."
+```
+
+``` python
+def render_verify_step(
+    result:Optional[VerificationResult]=None,  # Verification result or None for error
+    urls:VerifyUrls=None,  # URL bundle for routes
+    error:str="",  # Error message if result is None
+) -> Any:  # Complete verify step component
+    "Render the complete verify step with all dashboard components."
+```
+
+#### Variables
+
+``` python
+DEBUG_VERIFY_RENDER = False
+```
+
 ### utils (`utils.ipynb`)
 
 > Formatting utilities for verification display
@@ -188,6 +507,99 @@ def truncate_text(
     max_length: int = 60  # Maximum length before truncation
 ) -> str:  # Truncated text with ellipsis if needed
     "Truncate text for sample segment display."
+```
+
+### verification_summary (`verification_summary.ipynb`)
+
+> Summary cards for document info, segments stats, and source info
+
+#### Import
+
+``` python
+from cjm_transcript_verify.components.verification_summary import (
+    render_document_section,
+    render_segments_section,
+    render_sources_section,
+    render_verification_summary
+)
+```
+
+#### Functions
+
+``` python
+def _render_stat_row(
+    label:str,  # Label text
+    value:str,  # Value text
+) -> Any:  # Stat row element
+    "Render a label-value row for summary display."
+```
+
+``` python
+def _render_section_header(
+    icon:Any,  # Lucide icon component
+    title:str,  # Section title
+) -> Any:  # Section header element
+    "Render a section header with icon."
+```
+
+``` python
+def render_document_section(
+    result:VerificationResult,  # Verification result with document info
+) -> Any:  # Document info card
+    "Render the document info section."
+```
+
+``` python
+def render_segments_section(
+    result:VerificationResult,  # Verification result with segment stats
+) -> Any:  # Segments stats card
+    "Render the segments statistics section."
+```
+
+``` python
+def render_sources_section(
+    result:VerificationResult,  # Verification result with source info
+) -> Any:  # Sources info card
+    "Render the source traceability section."
+```
+
+``` python
+def render_verification_summary(
+    result:VerificationResult,  # Verification result to display
+) -> Any:  # Summary section with all info cards
+    "Render the full verification summary with document, segments, and sources."
+```
+
+### verify (`verify.ipynb`)
+
+> Verification route that queries graph and computes results
+
+#### Import
+
+``` python
+from cjm_transcript_verify.routes.verify import (
+    DEBUG_VERIFY_ROUTES,
+    init_verify_router
+)
+```
+
+#### Functions
+
+``` python
+def init_verify_router(
+    state_store:WorkflowStateStore,  # The workflow state store
+    workflow_id:str,  # The workflow identifier
+    prefix:str,  # Route prefix (e.g., "/workflow/verify")
+    verify_service:VerifyService,  # Service for graph queries
+    urls:VerifyUrls,  # URL bundle (will be populated)
+) -> Tuple[APIRouter, Dict[str, Callable]]:  # (router, routes dict)
+    "Initialize verify route that computes verification results."
+```
+
+#### Variables
+
+``` python
+DEBUG_VERIFY_ROUTES = False
 ```
 
 ### services.verify (`verify.ipynb`)
