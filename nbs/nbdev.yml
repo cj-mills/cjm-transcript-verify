@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "cjm-transcript-verify"
+  site-url: "https://cj-mills.github.io/cjm-transcript-verify"
+  description: "A FastHTML verification step for transcript decomposition workflows that queries the context graph database to display integrity checks and sample inspection."
+  repo-branch: main
+  repo-url: "https://github.com/cj-mills/cjm-transcript-verify"
