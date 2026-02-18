@@ -8,6 +8,7 @@ Run with: python demo_app.py
 
 from pathlib import Path
 import asyncio
+import tempfile
 
 from fasthtml.common import (
     fast_app, Div, H1, P, Span,
@@ -37,11 +38,15 @@ from cjm_fasthtml_tailwind.core.base import combine_classes
 from cjm_fasthtml_app_core.core.routing import register_routes
 from cjm_fasthtml_app_core.core.htmx import handle_htmx_request
 
+# State store
+from cjm_workflow_state.state_store import SQLiteWorkflowStateStore
+
 # Library imports
 from cjm_transcript_verify.html_ids import VerifyHtmlIds
 from cjm_transcript_verify.models import VerifyUrls, VerificationResult
 from cjm_transcript_verify.services.verify import VerifyService
 from cjm_transcript_verify.components.step_renderer import render_verify_step
+from cjm_transcript_verify.routes.init import init_verify_routers
 
 
 # =============================================================================
@@ -50,6 +55,10 @@ from cjm_transcript_verify.components.step_renderer import render_verify_step
 
 # Path to test graph database
 TEST_GRAPH_DB = Path(__file__).parent / "test_files" / "graph.db"
+
+# Demo workflow/session IDs
+DEMO_WORKFLOW_ID = "verify-demo"
+DEMO_SESSION_ID = "default"
 
 
 # =============================================================================
@@ -101,7 +110,7 @@ def run_async(coro):
 # Demo Page Renderer
 # =============================================================================
 
-def render_demo_page(verify_service, urls):
+def render_demo_page(verify_service, urls, state_store):
     """Create the demo page content with verification dashboard."""
 
     if not verify_service.is_available():
@@ -189,6 +198,13 @@ def render_demo_page(verify_service, urls):
             )
         )
 
+    # Store document_id in state for sample route to use
+    workflow_state = state_store.get_state(DEMO_WORKFLOW_ID, DEMO_SESSION_ID)
+    step_states = workflow_state.get("step_states", {})
+    step_states["verify"] = {"document_id": document_id}
+    workflow_state["step_states"] = step_states
+    state_store.update_state(DEMO_WORKFLOW_ID, DEMO_SESSION_ID, workflow_state)
+
     return Div(
         # Header
         Div(
@@ -274,12 +290,31 @@ def main():
     print(f"  Test database exists: {TEST_GRAPH_DB.exists()}")
 
     # -------------------------------------------------------------------------
+    # Create State Store
+    # -------------------------------------------------------------------------
+    temp_db = Path(tempfile.gettempdir()) / "cjm_transcript_verify_demo_state.db"
+    state_store = SQLiteWorkflowStateStore(temp_db)
+    print(f"\n[State Store]")
+    print(f"  Database: {temp_db}")
+
+    # -------------------------------------------------------------------------
     # Create VerifyService
     # -------------------------------------------------------------------------
     verify_service = VerifyService(plugin_manager, graph_plugin_name)
 
-    # Create URL bundle (no routes wired for demo)
-    urls = VerifyUrls()
+    # -------------------------------------------------------------------------
+    # Initialize Verify Routers
+    # -------------------------------------------------------------------------
+    verify_routers, urls, verify_routes = init_verify_routers(
+        state_store=state_store,
+        workflow_id=DEMO_WORKFLOW_ID,
+        prefix="/verify",
+        verify_service=verify_service,
+    )
+
+    print("\n[Verify Routes]")
+    print(f"  urls.verify: {urls.verify}")
+    print(f"  urls.sample: {urls.sample}")
 
     # -------------------------------------------------------------------------
     # Page routes
@@ -287,12 +322,19 @@ def main():
     @router
     def index(request, sess):
         """Demo homepage."""
-        return handle_htmx_request(request, lambda: render_demo_page(verify_service, urls))
+        # Ensure session has default ID for state lookup
+        if "session_id" not in sess:
+            sess["session_id"] = DEMO_SESSION_ID
+        return handle_htmx_request(request, lambda: render_demo_page(verify_service, urls, state_store))
 
     # -------------------------------------------------------------------------
     # Register routes
     # -------------------------------------------------------------------------
     register_routes(app, router)
+
+    # Register verify routers
+    for verify_router in verify_routers:
+        register_routes(app, verify_router)
 
     # Debug output
     print("\n" + "=" * 70)

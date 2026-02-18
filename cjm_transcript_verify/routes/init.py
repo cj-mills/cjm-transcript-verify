@@ -14,6 +14,7 @@ from ..models import VerifyUrls
 from ..services.verify import VerifyService
 from .core import WorkflowStateStore
 from .verify import init_verify_router
+from .sample import init_sample_router
 
 # %% ../../nbs/routes/init.ipynb #verify-routes-init-assembly
 def init_verify_routers(
@@ -31,11 +32,16 @@ def init_verify_routers(
         state_store, workflow_id, prefix, verify_service, urls
     )
     
+    # Initialize sample router
+    sample_router, sample_routes = init_sample_router(
+        state_store, workflow_id, prefix, verify_service, urls
+    )
+    
     # Populate the URL bundle using .to() on route functions
     urls.verify = verify_routes["verify"].to()
-    # urls.sample will be populated in Phase 4 when sample router is added
+    urls.sample = sample_routes["sample"].to()
     
-    routers = [verify_router]
-    all_routes = {**verify_routes}
+    routers = [verify_router, sample_router]
+    all_routes = {**verify_routes, **sample_routes}
     
     return routers, urls, all_routes

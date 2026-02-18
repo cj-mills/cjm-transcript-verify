@@ -18,9 +18,10 @@ pip install cjm_transcript_verify
     │   ├── sample_segments.ipynb       # Sample segment display with first/last segments and jump-to-index
     │   ├── step_renderer.ipynb         # Main verify step renderer combining all dashboard components
     │   └── verification_summary.ipynb  # Summary cards for document info, segments stats, and source info
-    ├── routes/ (3)
+    ├── routes/ (4)
     │   ├── core.ipynb    # Verify step state management helpers for routes
     │   ├── init.ipynb    # Router assembly for Phase 4 verify routes
+    │   ├── sample.ipynb  # Jump-to-index route for fetching a single segment by index
     │   └── verify.ipynb  # Verification route that queries graph and computes results
     ├── services/ (1)
     │   └── verify.ipynb  # Service layer for querying graph database and computing verification results
@@ -28,7 +29,7 @@ pip install cjm_transcript_verify
     ├── models.ipynb    # Verify step state and verification result models for Phase 4: Verify
     └── utils.ipynb     # Formatting utilities for verification display
 
-Total: 12 notebooks across 3 directories
+Total: 13 notebooks across 3 directories
 
 ## Module Dependencies
 
@@ -43,38 +44,44 @@ graph LR
     models[models<br/>models]
     routes_core[routes.core<br/>core]
     routes_init[routes.init<br/>init]
+    routes_sample[routes.sample<br/>sample]
     routes_verify[routes.verify<br/>verify]
     services_verify[services.verify<br/>services.verify]
     utils[utils<br/>utils]
 
     components_helpers --> models
-    components_integrity_checks --> models
     components_integrity_checks --> html_ids
-    components_sample_segments --> utils
-    components_sample_segments --> models
+    components_integrity_checks --> models
     components_sample_segments --> html_ids
+    components_sample_segments --> models
+    components_sample_segments --> utils
     components_step_renderer --> components_sample_segments
+    components_step_renderer --> html_ids
     components_step_renderer --> models
     components_step_renderer --> components_verification_summary
-    components_step_renderer --> html_ids
     components_step_renderer --> components_integrity_checks
+    components_verification_summary --> html_ids
     components_verification_summary --> utils
     components_verification_summary --> models
-    components_verification_summary --> html_ids
     routes_core --> models
     routes_init --> models
-    routes_init --> routes_verify
     routes_init --> services_verify
+    routes_init --> routes_sample
+    routes_init --> routes_verify
     routes_init --> routes_core
-    routes_verify --> services_verify
-    routes_verify --> routes_core
-    routes_verify --> components_step_renderer
+    routes_sample --> models
+    routes_sample --> services_verify
+    routes_sample --> routes_core
+    routes_sample --> components_sample_segments
     routes_verify --> models
+    routes_verify --> services_verify
+    routes_verify --> components_step_renderer
+    routes_verify --> routes_core
     services_verify --> models
     services_verify --> utils
 ```
 
-*25 cross-module dependencies detected*
+*30 cross-module dependencies detected*
 
 ## CLI Reference
 
@@ -352,6 +359,38 @@ class VerifyUrls:
     sample: str = ''  # Jump-to-index sample fetch route
 ```
 
+### sample (`sample.ipynb`)
+
+> Jump-to-index route for fetching a single segment by index
+
+#### Import
+
+``` python
+from cjm_transcript_verify.routes.sample import (
+    DEBUG_SAMPLE_ROUTES,
+    init_sample_router
+)
+```
+
+#### Functions
+
+``` python
+def init_sample_router(
+    state_store:WorkflowStateStore,  # The workflow state store
+    workflow_id:str,  # The workflow identifier
+    prefix:str,  # Route prefix (e.g., "/workflow/verify")
+    verify_service:VerifyService,  # Service for graph queries
+    urls:VerifyUrls,  # URL bundle (will be populated)
+) -> Tuple[APIRouter, Dict[str, Callable]]:  # (router, routes dict)
+    "Initialize sample route for jump-to-index segment fetching."
+```
+
+#### Variables
+
+``` python
+DEBUG_SAMPLE_ROUTES = False
+```
+
 ### sample_segments (`sample_segments.ipynb`)
 
 > Sample segment display with first/last segments and jump-to-index
@@ -388,10 +427,10 @@ def render_sample_list(
 
 ``` python
 def render_jump_to_index(
-    urls:VerifyUrls=None,  # URL bundle for routes (Phase 4)
+    urls:VerifyUrls=None,  # URL bundle for routes
     max_index:int=0,  # Maximum valid index for placeholder
-) -> Any:  # Jump-to-index form
-    "Render the jump-to-index input form."
+) -> Any:  # Jump-to-index form with loading indicator
+    "Render the jump-to-index input form with loading state."
 ```
 
 ``` python

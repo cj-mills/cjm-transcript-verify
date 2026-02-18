@@ -39,6 +39,7 @@ class VerifyHtmlIds:
     JUMP_BUTTON = "sd-verify-jump-button"
     JUMP_RESULT = "sd-verify-jump-result"
     JUMP_ERROR = "sd-verify-jump-error"
+    JUMP_LOADING = "sd-verify-jump-loading"
     
     # Footer & Toolbar
     VERIFY_TOOLBAR = "sd-verify-toolbar"

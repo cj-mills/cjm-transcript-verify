@@ -14,6 +14,7 @@ from fasthtml.common import Div, Span, H3, Input, Button, Form
 from cjm_fasthtml_daisyui.components.data_display.card import card, card_body
 from cjm_fasthtml_daisyui.components.data_input.text_input import text_input, text_input_sizes
 from cjm_fasthtml_daisyui.components.actions.button import btn, btn_colors, btn_sizes
+from cjm_fasthtml_daisyui.components.feedback.loading import loading, loading_styles, loading_sizes
 from cjm_fasthtml_daisyui.utilities.semantic_colors import bg_dui, text_dui
 
 # Tailwind utilities
@@ -83,10 +84,10 @@ def render_sample_list(
 
 # %% ../../nbs/components/sample_segments.ipynb #verify-samples-jump
 def render_jump_to_index(
-    urls:VerifyUrls=None,  # URL bundle for routes (Phase 4)
+    urls:VerifyUrls=None,  # URL bundle for routes
     max_index:int=0,  # Maximum valid index for placeholder
-) -> Any:  # Jump-to-index form
-    """Render the jump-to-index input form."""
+) -> Any:  # Jump-to-index form with loading indicator
+    """Render the jump-to-index input form with loading state."""
     urls = urls or VerifyUrls()
     
     # Build form attributes
@@ -96,9 +97,16 @@ def render_jump_to_index(
             "hx_post": urls.sample,
             "hx_target": f"#{VerifyHtmlIds.JUMP_RESULT}",
             "hx_swap": "innerHTML",
+            "hx_indicator": f"#{VerifyHtmlIds.JUMP_LOADING}",
         })
     
     placeholder = f"0-{max_index}" if max_index > 0 else "index"
+    
+    # Loading indicator (hidden by default, shown during HTMX request)
+    loading_indicator = Span(
+        cls=combine_classes(loading, loading_styles.spinner, loading_sizes.sm, "htmx-indicator"),
+        id=VerifyHtmlIds.JUMP_LOADING
+    )
     
     return Div(
         Span("Jump to index:", cls=combine_classes(font_size.sm, font_weight.medium)),
@@ -118,6 +126,7 @@ def render_jump_to_index(
                 id=VerifyHtmlIds.JUMP_BUTTON,
                 cls=combine_classes(btn, btn_colors.primary, btn_sizes.sm)
             ),
+            loading_indicator,
             method="post",
             cls=combine_classes(flex_display, items.center, gap(2)),
             **form_attrs
