@@ -8,3 +8,178 @@
 ``` bash
 pip install cjm_transcript_verify
 ```
+
+## Project Structure
+
+    nbs/
+    ├── html_ids.ipynb # HTML ID constants for Phase 4: Verify
+    ├── models.ipynb   # Verify step state and verification result models for Phase 4: Verify
+    └── utils.ipynb    # Formatting utilities for verification display
+
+Total: 3 notebooks across 3 directories
+
+## Module Dependencies
+
+``` mermaid
+graph LR
+    html_ids[html_ids<br/>html_ids]
+    models[models<br/>models]
+    utils[utils<br/>utils]
+```
+
+No cross-module dependencies detected.
+
+## CLI Reference
+
+No CLI commands found in this project.
+
+## Module Overview
+
+Detailed documentation for each module in the project:
+
+### html_ids (`html_ids.ipynb`)
+
+> HTML ID constants for Phase 4: Verify
+
+#### Import
+
+``` python
+from cjm_transcript_verify.html_ids import (
+    VerifyHtmlIds
+)
+```
+
+#### Classes
+
+``` python
+class VerifyHtmlIds:
+    "HTML ID constants for Phase 4: Verify."
+    
+    def as_selector(
+            id_str: str  # The HTML ID to convert
+        ) -> str:  # CSS selector with # prefix
+        "Convert an ID to a CSS selector format."
+```
+
+### models (`models.ipynb`)
+
+> Verify step state and verification result models for Phase 4: Verify
+
+#### Import
+
+``` python
+from cjm_transcript_verify.models import (
+    VerifyStepState,
+    SegmentSample,
+    VerificationResult,
+    VerifyUrls
+)
+```
+
+#### Classes
+
+``` python
+class VerifyStepState(TypedDict):
+    "State for Phase 4: Verify."
+```
+
+``` python
+@dataclass
+class SegmentSample:
+    "Lightweight segment data for sample display."
+    
+    index: int  # Segment index in document
+    text: str  # Truncated text (~60 chars)
+    start_time: Optional[float]  # Start time in seconds
+    end_time: Optional[float]  # End time in seconds
+    
+    def duration(self) -> Optional[float]:  # Computed duration in seconds
+            """Compute duration from start and end times."""
+            if self.start_time is not None and self.end_time is not None
+        "Compute duration from start and end times."
+```
+
+``` python
+@dataclass
+class VerificationResult:
+    "Complete verification data from graph database queries."
+    
+    document_id: str  # UUID of Document node
+    document_title: str  # Document title
+    document_media_type: str  # Media type ('audio', 'video', 'text')
+    segment_count: int  # Total number of segments
+    total_duration: float  # Total duration in seconds
+    avg_segment_duration: float  # Average segment duration in seconds
+    has_starts_with: bool  # Whether STARTS_WITH edge exists
+    starts_with_count: int  # Number of STARTS_WITH edges (should be 1)
+    next_chain_complete: bool  # Whether NEXT chain is complete
+    next_count: int  # Number of NEXT edges (should be segment_count - 1)
+    part_of_complete: bool  # Whether all PART_OF edges exist
+    part_of_count: int  # Number of PART_OF edges (should be segment_count)
+    all_have_timing: bool  # Whether all segments have timing
+    segments_missing_timing: int  # Count of segments without timing
+    all_have_sources: bool  # Whether all segments have sources
+    segments_missing_sources: int  # Count of segments without sources
+    source_plugins: List[str] = field(...)  # Unique plugin names
+    first_segments: List[SegmentSample] = field(...)  # First 3 segments
+    last_segments: List[SegmentSample] = field(...)  # Last 3 segments
+    
+    def all_checks_passed(self) -> bool:  # Whether all integrity checks passed
+        "Check if all integrity checks passed."
+```
+
+``` python
+@dataclass
+class VerifyUrls:
+    "URL bundle for Phase 4 verify route handlers."
+    
+    verify: str = ''  # Main verification computation route
+    sample: str = ''  # Jump-to-index sample fetch route
+```
+
+### utils (`utils.ipynb`)
+
+> Formatting utilities for verification display
+
+#### Import
+
+``` python
+from cjm_transcript_verify.utils import (
+    format_duration_mmss,
+    format_duration_seconds,
+    format_time_range,
+    truncate_text
+)
+```
+
+#### Functions
+
+``` python
+def format_duration_mmss(
+    seconds: Optional[float]  # Duration in seconds
+) -> str:  # Formatted string (mm:ss)
+    "Format duration in seconds as mm:ss for summary display."
+```
+
+``` python
+def format_duration_seconds(
+    seconds: Optional[float]  # Duration in seconds
+) -> str:  # Formatted string (e.g., "10.3s")
+    "Format duration in seconds as Xs or X.Xs for average display."
+```
+
+``` python
+def format_time_range(
+    start: Optional[float],  # Start time in seconds
+    end: Optional[float]  # End time in seconds
+) -> str:  # Formatted range (e.g., "0.0s - 2.1s")
+    "Format time range for sample segment display."
+```
+
+``` python
+def truncate_text(
+    text: Optional[str],  # Full text to truncate
+    max_length: int = 60  # Maximum length before truncation
+) -> str:  # Truncated text with ellipsis if needed
+    "Truncate text for sample segment display."
+```
