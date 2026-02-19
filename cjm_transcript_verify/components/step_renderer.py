@@ -11,13 +11,16 @@ from typing import Any, Optional
 from fasthtml.common import Div, H2, Span
 
 # DaisyUI components
-from cjm_fasthtml_daisyui.components.data_display.badge import badge, badge_styles, badge_sizes
+from cjm_fasthtml_daisyui.components.data_display.badge import (
+    badge, badge_colors, badge_styles, badge_sizes
+)
+from cjm_fasthtml_daisyui.components.feedback.loading import loading, loading_styles, loading_sizes
 from cjm_fasthtml_daisyui.utilities.semantic_colors import bg_dui, text_dui
 
 # Tailwind utilities
 from cjm_fasthtml_tailwind.utilities.spacing import p, m
 from cjm_fasthtml_tailwind.utilities.sizing import h, max_w, container
-from cjm_fasthtml_tailwind.utilities.typography import font_size, font_weight
+from cjm_fasthtml_tailwind.utilities.typography import font_size, font_weight, text_align
 from cjm_fasthtml_tailwind.utilities.layout import overflow
 from cjm_fasthtml_tailwind.utilities.flexbox_and_grid import (
     flex_display, flex_direction, justify, items, gap, grow
@@ -48,7 +51,7 @@ def render_verify_header(
             "All Checks Passed",
             cls=combine_classes(
                 badge, badge_styles.outline, badge_sizes.md,
-                "badge-success", flex_display, items.center, gap(1)
+                badge_colors.success, flex_display, items.center, gap(1)
             )
         )
     else:
@@ -57,7 +60,7 @@ def render_verify_header(
             "Issues Detected",
             cls=combine_classes(
                 badge, badge_styles.outline, badge_sizes.md,
-                "badge-warning", flex_display, items.center, gap(1)
+                badge_colors.warning, flex_display, items.center, gap(1)
             )
         )
     
@@ -88,7 +91,7 @@ def render_verify_error(
             ),
             cls=combine_classes(
                 flex_display, flex_direction.col, items.center, justify.center,
-                p(8), "text-center"
+                p(8), text_align.center
             )
         ),
         id=VerifyHtmlIds.VERIFY_CONTENT,
@@ -100,7 +103,7 @@ def render_verify_loading() -> Any:  # Loading indicator
     """Render a loading state for the verify step."""
     return Div(
         Div(
-            Span(cls="loading loading-spinner loading-lg"),
+            Span(cls=combine_classes(loading, loading_styles.spinner, loading_sizes.lg)),
             Span(
                 "Loading verification data...",
                 cls=combine_classes(font_size.lg, m.t(4))

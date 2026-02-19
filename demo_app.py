@@ -22,7 +22,9 @@ from cjm_plugin_system.core.scheduling import SafetyScheduler
 # DaisyUI components
 from cjm_fasthtml_daisyui.core.resources import get_daisyui_headers
 from cjm_fasthtml_daisyui.core.testing import create_theme_persistence_script
-from cjm_fasthtml_daisyui.components.data_display.badge import badge, badge_styles, badge_sizes
+from cjm_fasthtml_daisyui.components.data_display.badge import (
+    badge, badge_colors, badge_styles, badge_sizes
+)
 from cjm_fasthtml_daisyui.utilities.semantic_colors import text_dui
 
 # Tailwind utilities
@@ -40,6 +42,7 @@ from cjm_fasthtml_app_core.core.htmx import handle_htmx_request
 
 # State store
 from cjm_workflow_state.state_store import SQLiteWorkflowStateStore
+from cjm_fasthtml_interactions.core.state_store import get_session_id
 
 # Library imports
 from cjm_transcript_verify.html_ids import VerifyHtmlIds
@@ -110,7 +113,7 @@ def run_async(coro):
 # Demo Page Renderer
 # =============================================================================
 
-def render_demo_page(verify_service, urls, state_store):
+def render_demo_page(verify_service, urls, state_store, session_id):
     """Create the demo page content with verification dashboard."""
 
     if not verify_service.is_available():
@@ -120,7 +123,7 @@ def render_demo_page(verify_service, urls, state_store):
                 H1("Verify Demo", cls=combine_classes(font_size._3xl, font_weight.bold)),
                 Span(
                     "Plugin Not Available",
-                    cls=combine_classes(badge, badge_styles.outline, badge_sizes.sm, "badge-error")
+                    cls=combine_classes(badge, badge_styles.outline, badge_sizes.sm, badge_colors.error)
                 ),
                 cls=combine_classes(flex_display, justify.between, items.center, m.b(4))
             ),
@@ -154,7 +157,7 @@ def render_demo_page(verify_service, urls, state_store):
                 H1("Verify Demo", cls=combine_classes(font_size._3xl, font_weight.bold)),
                 Span(
                     "No Document Found",
-                    cls=combine_classes(badge, badge_styles.outline, badge_sizes.sm, "badge-warning")
+                    cls=combine_classes(badge, badge_styles.outline, badge_sizes.sm, badge_colors.warning)
                 ),
                 cls=combine_classes(flex_display, justify.between, items.center, m.b(4))
             ),
@@ -182,7 +185,7 @@ def render_demo_page(verify_service, urls, state_store):
                 H1("Verify Demo", cls=combine_classes(font_size._3xl, font_weight.bold)),
                 Span(
                     "Verification Failed",
-                    cls=combine_classes(badge, badge_styles.outline, badge_sizes.sm, "badge-error")
+                    cls=combine_classes(badge, badge_styles.outline, badge_sizes.sm, badge_colors.error)
                 ),
                 cls=combine_classes(flex_display, justify.between, items.center, m.b(4))
             ),
@@ -199,11 +202,11 @@ def render_demo_page(verify_service, urls, state_store):
         )
 
     # Store document_id in state for sample route to use
-    workflow_state = state_store.get_state(DEMO_WORKFLOW_ID, DEMO_SESSION_ID)
+    workflow_state = state_store.get_state(DEMO_WORKFLOW_ID, session_id)
     step_states = workflow_state.get("step_states", {})
     step_states["verify"] = {"document_id": document_id}
     workflow_state["step_states"] = step_states
-    state_store.update_state(DEMO_WORKFLOW_ID, DEMO_SESSION_ID, workflow_state)
+    state_store.update_state(DEMO_WORKFLOW_ID, session_id, workflow_state)
 
     return Div(
         # Header
@@ -211,7 +214,7 @@ def render_demo_page(verify_service, urls, state_store):
             H1("Verify Demo", cls=combine_classes(font_size._3xl, font_weight.bold)),
             Span(
                 "Plugin Loaded",
-                cls=combine_classes(badge, badge_styles.outline, badge_sizes.sm, "badge-success")
+                cls=combine_classes(badge, badge_styles.outline, badge_sizes.sm, badge_colors.success)
             ),
             cls=combine_classes(flex_display, justify.between, items.center, m.b(4))
         ),
@@ -322,10 +325,11 @@ def main():
     @router
     def index(request, sess):
         """Demo homepage."""
-        # Ensure session has default ID for state lookup
-        if "session_id" not in sess:
-            sess["session_id"] = DEMO_SESSION_ID
-        return handle_htmx_request(request, lambda: render_demo_page(verify_service, urls, state_store))
+        session_id = get_session_id(sess)
+        return handle_htmx_request(
+            request,
+            lambda: render_demo_page(verify_service, urls, state_store, session_id)
+        )
 
     # -------------------------------------------------------------------------
     # Register routes

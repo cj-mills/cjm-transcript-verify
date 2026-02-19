@@ -12,9 +12,10 @@ from fasthtml.common import Div, Span, H3
 
 # DaisyUI components
 from cjm_fasthtml_daisyui.components.data_display.card import card, card_body
-from cjm_fasthtml_daisyui.utilities.semantic_colors import bg_dui, text_dui
+from cjm_fasthtml_daisyui.utilities.semantic_colors import bg_dui, text_dui, shadow_dui
 
 # Tailwind utilities
+from cjm_fasthtml_tailwind.utilities.effects import shadow
 from cjm_fasthtml_tailwind.utilities.spacing import p, m
 from cjm_fasthtml_tailwind.utilities.typography import font_size, font_weight
 from cjm_fasthtml_tailwind.utilities.flexbox_and_grid import (
@@ -113,5 +114,5 @@ def render_integrity_checks(
             cls=str(card_body)
         ),
         id=VerifyHtmlIds.INTEGRITY_SECTION,
-        cls=combine_classes(card, bg_dui.base_100, "shadow-sm")
+        cls=combine_classes(card, bg_dui.base_100, shadow.sm, shadow_dui.primary)
     )

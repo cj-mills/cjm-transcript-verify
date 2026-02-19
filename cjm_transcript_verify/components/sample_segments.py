@@ -15,14 +15,16 @@ from cjm_fasthtml_daisyui.components.data_display.card import card, card_body
 from cjm_fasthtml_daisyui.components.data_input.text_input import text_input, text_input_sizes
 from cjm_fasthtml_daisyui.components.actions.button import btn, btn_colors, btn_sizes
 from cjm_fasthtml_daisyui.components.feedback.loading import loading, loading_styles, loading_sizes
-from cjm_fasthtml_daisyui.utilities.semantic_colors import bg_dui, text_dui
+from cjm_fasthtml_daisyui.utilities.semantic_colors import bg_dui, text_dui, shadow_dui, border_dui
 
 # Tailwind utilities
+from cjm_fasthtml_tailwind.utilities.borders import border
+from cjm_fasthtml_tailwind.utilities.effects import shadow
 from cjm_fasthtml_tailwind.utilities.spacing import p, m
 from cjm_fasthtml_tailwind.utilities.sizing import w
-from cjm_fasthtml_tailwind.utilities.typography import font_size, font_weight, font_family
+from cjm_fasthtml_tailwind.utilities.typography import font_size, font_weight, font_family, truncate
 from cjm_fasthtml_tailwind.utilities.flexbox_and_grid import (
-    flex_display, flex_direction, items, gap
+    flex_display, flex_direction, flex, items, gap
 )
 from cjm_fasthtml_tailwind.core.base import combine_classes
 
@@ -50,7 +52,7 @@ def render_sample_row(
         # Text (truncated)
         Span(
             f'"{sample.text}"',
-            cls=combine_classes(font_size.sm, "truncate", "flex-1")
+            cls=combine_classes(font_size.sm, truncate, flex._1)
         ),
         # Timing
         Span(
@@ -131,7 +133,7 @@ def render_jump_to_index(
             cls=combine_classes(flex_display, items.center, gap(2)),
             **form_attrs
         ),
-        cls=combine_classes(flex_display, items.center, gap(3), m.t(3), p.t(3), "border-t", "border-base-300")
+        cls=combine_classes(flex_display, items.center, gap(3), m.t(3), p.t(3), border.t(), border_dui.base_300)
     )
 
 # %% ../../nbs/components/sample_segments.ipynb #verify-samples-result
@@ -203,5 +205,5 @@ def render_sample_segments(
             cls=str(card_body)
         ),
         id=VerifyHtmlIds.SAMPLES_SECTION,
-        cls=combine_classes(card, bg_dui.base_100, "shadow-sm")
+        cls=combine_classes(card, bg_dui.base_100, shadow.sm, shadow_dui.primary)
     )

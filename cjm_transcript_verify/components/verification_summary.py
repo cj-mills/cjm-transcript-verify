@@ -12,14 +12,15 @@ from fasthtml.common import Div, Span, H3
 
 # DaisyUI components
 from cjm_fasthtml_daisyui.components.data_display.card import card, card_body, card_title
-from cjm_fasthtml_daisyui.utilities.semantic_colors import bg_dui, text_dui
+from cjm_fasthtml_daisyui.utilities.semantic_colors import bg_dui, text_dui, shadow_dui
 
 # Tailwind utilities
+from cjm_fasthtml_tailwind.utilities.effects import shadow
 from cjm_fasthtml_tailwind.utilities.spacing import p, m
-from cjm_fasthtml_tailwind.utilities.sizing import w
+from cjm_fasthtml_tailwind.utilities.sizing import w, min_w
 from cjm_fasthtml_tailwind.utilities.typography import font_size, font_weight, text_align
 from cjm_fasthtml_tailwind.utilities.flexbox_and_grid import (
-    flex_display, flex_direction, justify, items, gap, flex_wrap
+    flex_display, flex_direction, flex, justify, items, gap, flex_wrap
 )
 from cjm_fasthtml_tailwind.core.base import combine_classes
 
@@ -71,7 +72,10 @@ def render_document_section(
             cls=str(card_body)
         ),
         id=VerifyHtmlIds.DOCUMENT_SECTION,
-        cls=combine_classes(card, bg_dui.base_100, "shadow-sm")
+        cls=combine_classes(
+            card, bg_dui.base_100, shadow.sm, shadow_dui.primary,
+            flex._1, min_w('280px')
+        )
     )
 
 # %% ../../nbs/components/verification_summary.ipynb #verify-summary-segments
@@ -88,7 +92,10 @@ def render_segments_section(
             cls=str(card_body)
         ),
         id=VerifyHtmlIds.SEGMENTS_SECTION,
-        cls=combine_classes(card, bg_dui.base_100, "shadow-sm")
+        cls=combine_classes(
+            card, bg_dui.base_100, shadow.sm, shadow_dui.primary,
+            flex._1, min_w('280px')
+        )
     )
 
 # %% ../../nbs/components/verification_summary.ipynb #verify-summary-sources
@@ -105,7 +112,10 @@ def render_sources_section(
             cls=str(card_body)
         ),
         id=VerifyHtmlIds.SOURCES_SECTION,
-        cls=combine_classes(card, bg_dui.base_100, "shadow-sm")
+        cls=combine_classes(
+            card, bg_dui.base_100, shadow.sm, shadow_dui.primary,
+            flex._1, min_w('280px')
+        )
     )
 
 # %% ../../nbs/components/verification_summary.ipynb #verify-summary-grid
@@ -117,8 +127,5 @@ def render_verification_summary(
         render_document_section(result),
         render_segments_section(result),
         render_sources_section(result),
-        cls=combine_classes(
-            flex_display, flex_wrap.wrap, gap(4),
-            "[&>*]:flex-1", "[&>*]:min-w-[280px]"
-        )
+        cls=combine_classes(flex_display, flex_wrap.wrap, gap(4))
     )
