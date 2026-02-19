@@ -50,35 +50,35 @@ graph LR
     utils[utils<br/>utils]
 
     components_helpers --> models
-    components_integrity_checks --> html_ids
     components_integrity_checks --> models
-    components_sample_segments --> html_ids
+    components_integrity_checks --> html_ids
     components_sample_segments --> models
+    components_sample_segments --> html_ids
     components_sample_segments --> utils
-    components_step_renderer --> components_sample_segments
-    components_step_renderer --> html_ids
     components_step_renderer --> models
-    components_step_renderer --> components_verification_summary
     components_step_renderer --> components_integrity_checks
-    components_verification_summary --> html_ids
+    components_step_renderer --> html_ids
+    components_step_renderer --> components_verification_summary
+    components_step_renderer --> components_sample_segments
     components_verification_summary --> utils
     components_verification_summary --> models
+    components_verification_summary --> html_ids
     routes_core --> models
+    routes_init --> routes_core
     routes_init --> models
     routes_init --> services_verify
-    routes_init --> routes_sample
     routes_init --> routes_verify
-    routes_init --> routes_core
+    routes_init --> routes_sample
+    routes_sample --> routes_core
     routes_sample --> models
     routes_sample --> services_verify
-    routes_sample --> routes_core
     routes_sample --> components_sample_segments
-    routes_verify --> models
-    routes_verify --> services_verify
-    routes_verify --> components_step_renderer
     routes_verify --> routes_core
-    services_verify --> models
+    routes_verify --> models
+    routes_verify --> components_step_renderer
+    routes_verify --> services_verify
     services_verify --> utils
+    services_verify --> models
 ```
 
 *30 cross-module dependencies detected*
@@ -319,6 +319,15 @@ class SegmentSample:
             """Compute duration from start and end times."""
             if self.start_time is not None and self.end_time is not None
         "Compute duration from start and end times."
+    
+    def to_dict(self) -> dict:  # Serializable dictionary
+            """Convert to dictionary for serialization."""
+            return {
+                "index": self.index,
+        "Convert to dictionary for serialization."
+    
+    def from_dict(cls, data: dict) -> "SegmentSample":  # Reconstructed instance
+        "Create from dictionary."
 ```
 
 ``` python
@@ -347,7 +356,27 @@ class VerificationResult:
     last_segments: List[SegmentSample] = field(...)  # Last 3 segments
     
     def all_checks_passed(self) -> bool:  # Whether all integrity checks passed
+            """Check if all integrity checks passed."""
+            return (
+                self.has_starts_with and
+                self.starts_with_count == 1 and
+                self.next_chain_complete and
+                self.part_of_complete and
+                self.all_have_timing and
+                self.all_have_sources
+            )
+        
+        def to_dict(self) -> dict:  # Serializable dictionary
         "Check if all integrity checks passed."
+    
+    def to_dict(self) -> dict:  # Serializable dictionary
+            """Convert to dictionary for serialization."""
+            return {
+                "document_id": self.document_id,
+        "Convert to dictionary for serialization."
+    
+    def from_dict(cls, data: dict) -> "VerificationResult":  # Reconstructed instance
+        "Create from dictionary."
 ```
 
 ``` python

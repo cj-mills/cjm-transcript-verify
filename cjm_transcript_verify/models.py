@@ -33,6 +33,25 @@ class SegmentSample:
         if self.start_time is not None and self.end_time is not None:
             return self.end_time - self.start_time
         return None
+    
+    def to_dict(self) -> dict:  # Serializable dictionary
+        """Convert to dictionary for serialization."""
+        return {
+            "index": self.index,
+            "text": self.text,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+        }
+    
+    @classmethod
+    def from_dict(cls, data: dict) -> "SegmentSample":  # Reconstructed instance
+        """Create from dictionary."""
+        return cls(
+            index=data["index"],
+            text=data["text"],
+            start_time=data.get("start_time"),
+            end_time=data.get("end_time"),
+        )
 
 # %% ../nbs/models.ipynb #verification-result
 @dataclass
@@ -86,6 +105,55 @@ class VerificationResult:
             self.part_of_complete and
             self.all_have_timing and
             self.all_have_sources
+        )
+    
+    def to_dict(self) -> dict:  # Serializable dictionary
+        """Convert to dictionary for serialization."""
+        return {
+            "document_id": self.document_id,
+            "document_title": self.document_title,
+            "document_media_type": self.document_media_type,
+            "segment_count": self.segment_count,
+            "total_duration": self.total_duration,
+            "avg_segment_duration": self.avg_segment_duration,
+            "has_starts_with": self.has_starts_with,
+            "starts_with_count": self.starts_with_count,
+            "next_chain_complete": self.next_chain_complete,
+            "next_count": self.next_count,
+            "part_of_complete": self.part_of_complete,
+            "part_of_count": self.part_of_count,
+            "all_have_timing": self.all_have_timing,
+            "segments_missing_timing": self.segments_missing_timing,
+            "all_have_sources": self.all_have_sources,
+            "segments_missing_sources": self.segments_missing_sources,
+            "source_plugins": self.source_plugins,
+            "first_segments": [s.to_dict() for s in self.first_segments],
+            "last_segments": [s.to_dict() for s in self.last_segments],
+        }
+    
+    @classmethod
+    def from_dict(cls, data: dict) -> "VerificationResult":  # Reconstructed instance
+        """Create from dictionary."""
+        return cls(
+            document_id=data["document_id"],
+            document_title=data["document_title"],
+            document_media_type=data["document_media_type"],
+            segment_count=data["segment_count"],
+            total_duration=data["total_duration"],
+            avg_segment_duration=data["avg_segment_duration"],
+            has_starts_with=data["has_starts_with"],
+            starts_with_count=data["starts_with_count"],
+            next_chain_complete=data["next_chain_complete"],
+            next_count=data["next_count"],
+            part_of_complete=data["part_of_complete"],
+            part_of_count=data["part_of_count"],
+            all_have_timing=data["all_have_timing"],
+            segments_missing_timing=data["segments_missing_timing"],
+            all_have_sources=data["all_have_sources"],
+            segments_missing_sources=data["segments_missing_sources"],
+            source_plugins=data.get("source_plugins", []),
+            first_segments=[SegmentSample.from_dict(s) for s in data.get("first_segments", [])],
+            last_segments=[SegmentSample.from_dict(s) for s in data.get("last_segments", [])],
         )
 
 # %% ../nbs/models.ipynb #verify-urls
