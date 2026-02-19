@@ -10,6 +10,8 @@ from typing import Dict, Callable, Tuple
 
 from fasthtml.common import APIRouter
 
+from cjm_fasthtml_interactions.core.state_store import get_session_id
+
 from ..models import VerifyUrls
 from ..services.verify import VerifyService
 from .core import WorkflowStateStore, _load_verify_context
@@ -33,7 +35,7 @@ def init_verify_router(
     @router
     async def verify(request, sess):
         """Compute and return verification dashboard."""
-        session_id = sess.get("session_id", "default")
+        session_id = get_session_id(sess)
         
         if DEBUG_VERIFY_ROUTES:
             print(f"[VERIFY_ROUTES] verify called")

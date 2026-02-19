@@ -9,6 +9,7 @@ __all__ = ['WorkflowStateStore', 'DEBUG_VERIFY_STATE', 'VerifyContext']
 from typing import Dict, Any, Optional, NamedTuple
 
 from cjm_workflow_state.state_store import SQLiteWorkflowStateStore
+from cjm_fasthtml_interactions.core.state_store import get_session_id
 
 from ..models import VerifyStepState
 

@@ -50,33 +50,33 @@ graph LR
     utils[utils<br/>utils]
 
     components_helpers --> models
-    components_integrity_checks --> models
     components_integrity_checks --> html_ids
-    components_sample_segments --> models
+    components_integrity_checks --> models
     components_sample_segments --> html_ids
+    components_sample_segments --> models
     components_sample_segments --> utils
-    components_step_renderer --> models
-    components_step_renderer --> components_integrity_checks
     components_step_renderer --> html_ids
     components_step_renderer --> components_verification_summary
+    components_step_renderer --> models
     components_step_renderer --> components_sample_segments
+    components_step_renderer --> components_integrity_checks
+    components_verification_summary --> html_ids
     components_verification_summary --> utils
     components_verification_summary --> models
-    components_verification_summary --> html_ids
     routes_core --> models
-    routes_init --> routes_core
-    routes_init --> models
     routes_init --> services_verify
-    routes_init --> routes_verify
+    routes_init --> models
     routes_init --> routes_sample
-    routes_sample --> routes_core
-    routes_sample --> models
+    routes_init --> routes_core
+    routes_init --> routes_verify
     routes_sample --> services_verify
     routes_sample --> components_sample_segments
+    routes_sample --> routes_core
+    routes_sample --> models
+    routes_verify --> services_verify
+    routes_verify --> components_step_renderer
     routes_verify --> routes_core
     routes_verify --> models
-    routes_verify --> components_step_renderer
-    routes_verify --> services_verify
     services_verify --> utils
     services_verify --> models
 ```

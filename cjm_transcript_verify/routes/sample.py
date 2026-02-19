@@ -10,6 +10,8 @@ from typing import Dict, Callable, Tuple
 
 from fasthtml.common import APIRouter
 
+from cjm_fasthtml_interactions.core.state_store import get_session_id
+
 from ..models import VerifyUrls
 from ..services.verify import VerifyService
 from .core import WorkflowStateStore, _load_verify_context
@@ -33,10 +35,11 @@ def init_sample_router(
     @router
     async def sample(request, sess, index:str=""):
         """Fetch a single segment by index."""
-        session_id = sess.get("session_id", "default")
+        session_id = get_session_id(sess)
         
         if DEBUG_SAMPLE_ROUTES:
             print(f"[SAMPLE_ROUTES] sample called with index: {index!r}")
+            print(f"[SAMPLE_ROUTES] session_id: {session_id}")
         
         # Validate index is provided and numeric
         if not index or not index.strip():
@@ -53,6 +56,9 @@ def init_sample_router(
         
         # Load context to get document_id
         ctx = _load_verify_context(state_store, workflow_id, session_id)
+        
+        if DEBUG_SAMPLE_ROUTES:
+            print(f"[SAMPLE_ROUTES] document_id: {ctx.document_id}")
         
         if not ctx.document_id:
             return render_jump_result(error="No document loaded")
