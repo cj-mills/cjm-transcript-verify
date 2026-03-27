@@ -1,0 +1,493 @@
+[
+  {
+    "objectID": "services/verify.html#verifyservice",
+    "href": "services/verify.html#verifyservice",
+    "title": "services.verify",
+    "section": "VerifyService",
+    "text": "VerifyService\n\nsource\n\nVerifyService\n\ndef VerifyService(\n    plugin_manager:PluginManager, # Plugin manager for accessing graph plugin\n    plugin_name:str='cjm-graph-plugin-sqlite', # Name of the graph plugin\n):\n\nService for querying graph database and computing verification results.",
+    "crumbs": [
+      "services",
+      "services.verify"
+    ]
+  },
+  {
+    "objectID": "html_ids.html",
+    "href": "html_ids.html",
+    "title": "html_ids",
+    "section": "",
+    "text": "source\n\nVerifyHtmlIds\n\ndef VerifyHtmlIds(\n    args:VAR_POSITIONAL, kwargs:VAR_KEYWORD\n):\n\nHTML ID constants for Phase 4: Verify.",
+    "crumbs": [
+      "html_ids"
+    ]
+  },
+  {
+    "objectID": "models.html",
+    "href": "models.html",
+    "title": "models",
+    "section": "",
+    "text": "TypedDict for Phase 4: Verify step state.\n\nsource\n\n\n\ndef VerifyStepState(\n    args:VAR_POSITIONAL, kwargs:VAR_KEYWORD\n):\n\nState for Phase 4: Verify.",
+    "crumbs": [
+      "models"
+    ]
+  },
+  {
+    "objectID": "models.html#verifystepstate",
+    "href": "models.html#verifystepstate",
+    "title": "models",
+    "section": "",
+    "text": "TypedDict for Phase 4: Verify step state.\n\nsource\n\n\n\ndef VerifyStepState(\n    args:VAR_POSITIONAL, kwargs:VAR_KEYWORD\n):\n\nState for Phase 4: Verify.",
+    "crumbs": [
+      "models"
+    ]
+  },
+  {
+    "objectID": "models.html#segmentsample",
+    "href": "models.html#segmentsample",
+    "title": "models",
+    "section": "SegmentSample",
+    "text": "SegmentSample\nLightweight segment data for sample display.\n\nsource\n\nSegmentSample\n\ndef SegmentSample(\n    index:int, text:str, start_time:Optional=None, end_time:Optional=None\n)-&gt;None:\n\nLightweight segment data for sample display.",
+    "crumbs": [
+      "models"
+    ]
+  },
+  {
+    "objectID": "models.html#verificationresult",
+    "href": "models.html#verificationresult",
+    "title": "models",
+    "section": "VerificationResult",
+    "text": "VerificationResult\nComplete verification data computed from graph database queries.\n\nsource\n\nVerificationResult\n\ndef VerificationResult(\n    document_id:str, document_title:str, document_media_type:str, segment_count:int, total_duration:float,\n    avg_segment_duration:float, has_starts_with:bool, starts_with_count:int, next_chain_complete:bool,\n    next_count:int, part_of_complete:bool, part_of_count:int, all_have_timing:bool, segments_missing_timing:int,\n    all_have_sources:bool, segments_missing_sources:int, source_plugins:List=&lt;factory&gt;,\n    first_segments:List=&lt;factory&gt;, last_segments:List=&lt;factory&gt;\n)-&gt;None:\n\nComplete verification data from graph database queries.",
+    "crumbs": [
+      "models"
+    ]
+  },
+  {
+    "objectID": "models.html#verifyurls",
+    "href": "models.html#verifyurls",
+    "title": "models",
+    "section": "VerifyUrls",
+    "text": "VerifyUrls\nURL bundle for Phase 4 verify route handlers.\n\nsource\n\nVerifyUrls\n\ndef VerifyUrls(\n    verify:str='', sample:str=''\n)-&gt;None:\n\nURL bundle for Phase 4 verify route handlers.",
+    "crumbs": [
+      "models"
+    ]
+  },
+  {
+    "objectID": "components/helpers.html",
+    "href": "components/helpers.html",
+    "title": "helpers",
+    "section": "",
+    "text": "These extract verify state from the nested step_states.verify path in the interaction context. The verify step reads the document_id that was set by the review step after committing to the graph.",
+    "crumbs": [
+      "components",
+      "helpers"
+    ]
+  },
+  {
+    "objectID": "components/helpers.html#state-getters",
+    "href": "components/helpers.html#state-getters",
+    "title": "helpers",
+    "section": "",
+    "text": "These extract verify state from the nested step_states.verify path in the interaction context. The verify step reads the document_id that was set by the review step after committing to the graph.",
+    "crumbs": [
+      "components",
+      "helpers"
+    ]
+  },
+  {
+    "objectID": "components/helpers.html#cross-step-data-access",
+    "href": "components/helpers.html#cross-step-data-access",
+    "title": "helpers",
+    "section": "Cross-Step Data Access",
+    "text": "Cross-Step Data Access\nVerify step can also read document_id from the review step if it was set there during commit (fallback for initial load).",
+    "crumbs": [
+      "components",
+      "helpers"
+    ]
+  },
+  {
+    "objectID": "components/integrity_checks.html#integrity-section",
+    "href": "components/integrity_checks.html#integrity-section",
+    "title": "integrity_checks",
+    "section": "Integrity Section",
+    "text": "Integrity Section\n\nsource\n\nrender_integrity_checks\n\ndef render_integrity_checks(\n    result:VerificationResult, # Verification result with integrity data\n)-&gt;Any: # Integrity checks card\n\nRender the structure integrity checks section.",
+    "crumbs": [
+      "components",
+      "integrity_checks"
+    ]
+  },
+  {
+    "objectID": "routes/sample.html",
+    "href": "routes/sample.html",
+    "title": "sample",
+    "section": "",
+    "text": "source\n\n\n\ndef init_sample_router(\n    state_store:SQLiteWorkflowStateStore, # The workflow state store\n    workflow_id:str, # The workflow identifier\n    prefix:str, # Route prefix (e.g., \"/workflow/verify\")\n    verify_service:VerifyService, # Service for graph queries\n    urls:VerifyUrls, # URL bundle (will be populated)\n)-&gt;Tuple: # (router, routes dict)\n\nInitialize sample route for jump-to-index segment fetching.",
+    "crumbs": [
+      "routes",
+      "sample"
+    ]
+  },
+  {
+    "objectID": "routes/sample.html#router-initialization",
+    "href": "routes/sample.html#router-initialization",
+    "title": "sample",
+    "section": "",
+    "text": "source\n\n\n\ndef init_sample_router(\n    state_store:SQLiteWorkflowStateStore, # The workflow state store\n    workflow_id:str, # The workflow identifier\n    prefix:str, # Route prefix (e.g., \"/workflow/verify\")\n    verify_service:VerifyService, # Service for graph queries\n    urls:VerifyUrls, # URL bundle (will be populated)\n)-&gt;Tuple: # (router, routes dict)\n\nInitialize sample route for jump-to-index segment fetching.",
+    "crumbs": [
+      "routes",
+      "sample"
+    ]
+  },
+  {
+    "objectID": "routes/core.html",
+    "href": "routes/core.html",
+    "title": "core",
+    "section": "",
+    "text": "NamedTuple containing commonly-needed verify state values.\n\nsource\n\n\n\ndef VerifyContext(\n    args:VAR_POSITIONAL, kwargs:VAR_KEYWORD\n):\n\nCommon verify state values loaded by handlers.",
+    "crumbs": [
+      "routes",
+      "core"
+    ]
+  },
+  {
+    "objectID": "routes/core.html#verify-context",
+    "href": "routes/core.html#verify-context",
+    "title": "core",
+    "section": "",
+    "text": "NamedTuple containing commonly-needed verify state values.\n\nsource\n\n\n\ndef VerifyContext(\n    args:VAR_POSITIONAL, kwargs:VAR_KEYWORD\n):\n\nCommon verify state values loaded by handlers.",
+    "crumbs": [
+      "routes",
+      "core"
+    ]
+  },
+  {
+    "objectID": "routes/core.html#state-getters",
+    "href": "routes/core.html#state-getters",
+    "title": "core",
+    "section": "State Getters",
+    "text": "State Getters",
+    "crumbs": [
+      "routes",
+      "core"
+    ]
+  },
+  {
+    "objectID": "routes/core.html#load-context",
+    "href": "routes/core.html#load-context",
+    "title": "core",
+    "section": "Load Context",
+    "text": "Load Context\nLoads verify state in a single call, with fallback to review state for document_id.",
+    "crumbs": [
+      "routes",
+      "core"
+    ]
+  },
+  {
+    "objectID": "routes/core.html#state-updates",
+    "href": "routes/core.html#state-updates",
+    "title": "core",
+    "section": "State Updates",
+    "text": "State Updates",
+    "crumbs": [
+      "routes",
+      "core"
+    ]
+  },
+  {
+    "objectID": "routes/init.html",
+    "href": "routes/init.html",
+    "title": "init",
+    "section": "",
+    "text": "source\n\n\n\ndef init_verify_routers(\n    state_store:SQLiteWorkflowStateStore, # The workflow state store\n    workflow_id:str, # The workflow identifier\n    prefix:str, # Base prefix for verify routes (e.g., \"/workflow/verify\")\n    verify_service:VerifyService, # Service for graph queries\n)-&gt;Tuple: # (routers, urls, routes)\n\nInitialize and return all verify routers with URL bundle.",
+    "crumbs": [
+      "routes",
+      "init"
+    ]
+  },
+  {
+    "objectID": "routes/init.html#router-assembly",
+    "href": "routes/init.html#router-assembly",
+    "title": "init",
+    "section": "",
+    "text": "source\n\n\n\ndef init_verify_routers(\n    state_store:SQLiteWorkflowStateStore, # The workflow state store\n    workflow_id:str, # The workflow identifier\n    prefix:str, # Base prefix for verify routes (e.g., \"/workflow/verify\")\n    verify_service:VerifyService, # Service for graph queries\n)-&gt;Tuple: # (routers, urls, routes)\n\nInitialize and return all verify routers with URL bundle.",
+    "crumbs": [
+      "routes",
+      "init"
+    ]
+  },
+  {
+    "objectID": "routes/verify.html",
+    "href": "routes/verify.html",
+    "title": "verify",
+    "section": "",
+    "text": "source\n\n\n\ndef init_verify_router(\n    state_store:SQLiteWorkflowStateStore, # The workflow state store\n    workflow_id:str, # The workflow identifier\n    prefix:str, # Route prefix (e.g., \"/workflow/verify\")\n    verify_service:VerifyService, # Service for graph queries\n    urls:VerifyUrls, # URL bundle (will be populated)\n)-&gt;Tuple: # (router, routes dict)\n\nInitialize verify route that computes verification results.",
+    "crumbs": [
+      "routes",
+      "verify"
+    ]
+  },
+  {
+    "objectID": "routes/verify.html#router-initialization",
+    "href": "routes/verify.html#router-initialization",
+    "title": "verify",
+    "section": "",
+    "text": "source\n\n\n\ndef init_verify_router(\n    state_store:SQLiteWorkflowStateStore, # The workflow state store\n    workflow_id:str, # The workflow identifier\n    prefix:str, # Route prefix (e.g., \"/workflow/verify\")\n    verify_service:VerifyService, # Service for graph queries\n    urls:VerifyUrls, # URL bundle (will be populated)\n)-&gt;Tuple: # (router, routes dict)\n\nInitialize verify route that computes verification results.",
+    "crumbs": [
+      "routes",
+      "verify"
+    ]
+  },
+  {
+    "objectID": "components/sample_segments.html",
+    "href": "components/sample_segments.html",
+    "title": "sample_segments",
+    "section": "",
+    "text": "source\n\n\n\ndef render_sample_row(\n    sample:SegmentSample, # Segment sample to display\n)-&gt;Any: # Sample row element\n\nRender a single segment sample row.",
+    "crumbs": [
+      "components",
+      "sample_segments"
+    ]
+  },
+  {
+    "objectID": "components/sample_segments.html#sample-row-component",
+    "href": "components/sample_segments.html#sample-row-component",
+    "title": "sample_segments",
+    "section": "",
+    "text": "source\n\n\n\ndef render_sample_row(\n    sample:SegmentSample, # Segment sample to display\n)-&gt;Any: # Sample row element\n\nRender a single segment sample row.",
+    "crumbs": [
+      "components",
+      "sample_segments"
+    ]
+  },
+  {
+    "objectID": "components/sample_segments.html#sample-lists",
+    "href": "components/sample_segments.html#sample-lists",
+    "title": "sample_segments",
+    "section": "Sample Lists",
+    "text": "Sample Lists\n\nsource\n\nrender_sample_list\n\ndef render_sample_list(\n    samples:List, # Samples to display\n    label:str, # Label for this list (e.g., \"First\", \"Last\")\n    container_id:str='', # Optional container ID\n)-&gt;Any: # Sample list element\n\nRender a list of segment samples with label.",
+    "crumbs": [
+      "components",
+      "sample_segments"
+    ]
+  },
+  {
+    "objectID": "components/sample_segments.html#jump-to-index-input",
+    "href": "components/sample_segments.html#jump-to-index-input",
+    "title": "sample_segments",
+    "section": "Jump-to-Index Input",
+    "text": "Jump-to-Index Input\nInput field for jumping to a specific segment index. The actual route will be wired in Phase 4.\n\nsource\n\nrender_jump_to_index\n\ndef render_jump_to_index(\n    urls:VerifyUrls=None, # URL bundle for routes\n    max_index:int=0, # Maximum valid index for placeholder\n)-&gt;Any: # Jump-to-index form with loading indicator\n\nRender the jump-to-index input form with loading state.",
+    "crumbs": [
+      "components",
+      "sample_segments"
+    ]
+  },
+  {
+    "objectID": "components/sample_segments.html#jump-result-container",
+    "href": "components/sample_segments.html#jump-result-container",
+    "title": "sample_segments",
+    "section": "Jump Result Container",
+    "text": "Jump Result Container\n\nsource\n\nrender_jump_result\n\ndef render_jump_result(\n    sample:Optional=None, # Fetched sample or None\n    error:str='', # Error message if any\n)-&gt;Any: # Jump result display\n\nRender the jump-to-index result (single segment or error).",
+    "crumbs": [
+      "components",
+      "sample_segments"
+    ]
+  },
+  {
+    "objectID": "components/sample_segments.html#full-samples-section",
+    "href": "components/sample_segments.html#full-samples-section",
+    "title": "sample_segments",
+    "section": "Full Samples Section",
+    "text": "Full Samples Section\n\nsource\n\nrender_sample_segments\n\ndef render_sample_segments(\n    result:VerificationResult, # Verification result with samples\n    urls:VerifyUrls=None, # URL bundle for routes\n)-&gt;Any: # Sample segments card\n\nRender the full sample segments section.",
+    "crumbs": [
+      "components",
+      "sample_segments"
+    ]
+  },
+  {
+    "objectID": "components/verification_summary.html#document-section",
+    "href": "components/verification_summary.html#document-section",
+    "title": "verification_summary",
+    "section": "Document Section",
+    "text": "Document Section\n\nsource\n\nrender_document_section\n\ndef render_document_section(\n    result:VerificationResult, # Verification result with document info\n)-&gt;Any: # Document info card\n\nRender the document info section.",
+    "crumbs": [
+      "components",
+      "verification_summary"
+    ]
+  },
+  {
+    "objectID": "components/verification_summary.html#segments-section",
+    "href": "components/verification_summary.html#segments-section",
+    "title": "verification_summary",
+    "section": "Segments Section",
+    "text": "Segments Section\n\nsource\n\nrender_segments_section\n\ndef render_segments_section(\n    result:VerificationResult, # Verification result with segment stats\n)-&gt;Any: # Segments stats card\n\nRender the segments statistics section.",
+    "crumbs": [
+      "components",
+      "verification_summary"
+    ]
+  },
+  {
+    "objectID": "components/verification_summary.html#sources-section",
+    "href": "components/verification_summary.html#sources-section",
+    "title": "verification_summary",
+    "section": "Sources Section",
+    "text": "Sources Section\n\nsource\n\nrender_sources_section\n\ndef render_sources_section(\n    result:VerificationResult, # Verification result with source info\n)-&gt;Any: # Sources info card\n\nRender the source traceability section.",
+    "crumbs": [
+      "components",
+      "verification_summary"
+    ]
+  },
+  {
+    "objectID": "components/verification_summary.html#summary-grid",
+    "href": "components/verification_summary.html#summary-grid",
+    "title": "verification_summary",
+    "section": "Summary Grid",
+    "text": "Summary Grid\nCombines document, segments, and sources sections in a responsive grid.\n\nsource\n\nrender_verification_summary\n\ndef render_verification_summary(\n    result:VerificationResult, # Verification result to display\n)-&gt;Any: # Summary section with all info cards\n\nRender the full verification summary with document, segments, and sources.",
+    "crumbs": [
+      "components",
+      "verification_summary"
+    ]
+  },
+  {
+    "objectID": "components/step_renderer.html",
+    "href": "components/step_renderer.html",
+    "title": "step_renderer",
+    "section": "",
+    "text": "source\n\n\n\ndef render_verify_header(\n    all_passed:bool, # Whether all integrity checks passed\n)-&gt;Any: # Header element with title and status badge\n\nRender the verify step header with status badge.",
+    "crumbs": [
+      "components",
+      "step_renderer"
+    ]
+  },
+  {
+    "objectID": "components/step_renderer.html#header-component",
+    "href": "components/step_renderer.html#header-component",
+    "title": "step_renderer",
+    "section": "",
+    "text": "source\n\n\n\ndef render_verify_header(\n    all_passed:bool, # Whether all integrity checks passed\n)-&gt;Any: # Header element with title and status badge\n\nRender the verify step header with status badge.",
+    "crumbs": [
+      "components",
+      "step_renderer"
+    ]
+  },
+  {
+    "objectID": "components/step_renderer.html#error-state",
+    "href": "components/step_renderer.html#error-state",
+    "title": "step_renderer",
+    "section": "Error State",
+    "text": "Error State\n\nsource\n\nrender_verify_error\n\ndef render_verify_error(\n    message:str='Unable to load verification data', # Error message\n)-&gt;Any: # Error display element\n\nRender an error state for the verify step.",
+    "crumbs": [
+      "components",
+      "step_renderer"
+    ]
+  },
+  {
+    "objectID": "components/step_renderer.html#loading-state",
+    "href": "components/step_renderer.html#loading-state",
+    "title": "step_renderer",
+    "section": "Loading State",
+    "text": "Loading State\n\nsource\n\nrender_verify_loading\n\ndef render_verify_loading(\n    \n)-&gt;Any: # Loading indicator\n\nRender a loading state for the verify step.",
+    "crumbs": [
+      "components",
+      "step_renderer"
+    ]
+  },
+  {
+    "objectID": "components/step_renderer.html#full-step-renderer",
+    "href": "components/step_renderer.html#full-step-renderer",
+    "title": "step_renderer",
+    "section": "Full Step Renderer",
+    "text": "Full Step Renderer\n\nsource\n\nrender_verify_step\n\ndef render_verify_step(\n    result:Optional=None, # Verification result or None for error\n    urls:VerifyUrls=None, # URL bundle for routes\n    error:str='', # Error message if result is None\n)-&gt;Any: # Complete verify step component\n\nRender the complete verify step with all dashboard components.",
+    "crumbs": [
+      "components",
+      "step_renderer"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "cjm-transcript-verify",
+    "section": "",
+    "text": "pip install cjm_transcript_verify",
+    "crumbs": [
+      "cjm-transcript-verify"
+    ]
+  },
+  {
+    "objectID": "index.html#install",
+    "href": "index.html#install",
+    "title": "cjm-transcript-verify",
+    "section": "",
+    "text": "pip install cjm_transcript_verify",
+    "crumbs": [
+      "cjm-transcript-verify"
+    ]
+  },
+  {
+    "objectID": "index.html#project-structure",
+    "href": "index.html#project-structure",
+    "title": "cjm-transcript-verify",
+    "section": "Project Structure",
+    "text": "Project Structure\nnbs/\n├── components/ (5)\n│   ├── helpers.ipynb               # State getters for the verify step from InteractionContext\n│   ├── integrity_checks.ipynb      # Integrity check display with pass/fail indicators\n│   ├── sample_segments.ipynb       # Sample segment display with first/last segments and jump-to-index\n│   ├── step_renderer.ipynb         # Main verify step renderer combining all dashboard components\n│   └── verification_summary.ipynb  # Summary cards for document info, segments stats, and source info\n├── routes/ (4)\n│   ├── core.ipynb    # Verify step state management helpers for routes\n│   ├── init.ipynb    # Router assembly for Phase 4 verify routes\n│   ├── sample.ipynb  # Jump-to-index route for fetching a single segment by index\n│   └── verify.ipynb  # Verification route that queries graph and computes results\n├── services/ (1)\n│   └── verify.ipynb  # Service layer for querying graph database and computing verification results\n├── html_ids.ipynb  # HTML ID constants for Phase 4: Verify\n├── models.ipynb    # Verify step state and verification result models for Phase 4: Verify\n└── utils.ipynb     # Formatting utilities for verification display\nTotal: 13 notebooks across 3 directories",
+    "crumbs": [
+      "cjm-transcript-verify"
+    ]
+  },
+  {
+    "objectID": "index.html#module-dependencies",
+    "href": "index.html#module-dependencies",
+    "title": "cjm-transcript-verify",
+    "section": "Module Dependencies",
+    "text": "Module Dependencies\ngraph LR\n    components_helpers[components.helpers&lt;br/&gt;helpers]\n    components_integrity_checks[components.integrity_checks&lt;br/&gt;integrity_checks]\n    components_sample_segments[components.sample_segments&lt;br/&gt;sample_segments]\n    components_step_renderer[components.step_renderer&lt;br/&gt;step_renderer]\n    components_verification_summary[components.verification_summary&lt;br/&gt;verification_summary]\n    html_ids[html_ids&lt;br/&gt;html_ids]\n    models[models&lt;br/&gt;models]\n    routes_core[routes.core&lt;br/&gt;core]\n    routes_init[routes.init&lt;br/&gt;init]\n    routes_sample[routes.sample&lt;br/&gt;sample]\n    routes_verify[routes.verify&lt;br/&gt;verify]\n    services_verify[services.verify&lt;br/&gt;services.verify]\n    utils[utils&lt;br/&gt;utils]\n\n    components_helpers --&gt; models\n    components_integrity_checks --&gt; models\n    components_integrity_checks --&gt; html_ids\n    components_sample_segments --&gt; models\n    components_sample_segments --&gt; html_ids\n    components_sample_segments --&gt; utils\n    components_step_renderer --&gt; models\n    components_step_renderer --&gt; components_integrity_checks\n    components_step_renderer --&gt; html_ids\n    components_step_renderer --&gt; components_sample_segments\n    components_step_renderer --&gt; components_verification_summary\n    components_verification_summary --&gt; models\n    components_verification_summary --&gt; utils\n    components_verification_summary --&gt; html_ids\n    routes_core --&gt; models\n    routes_init --&gt; models\n    routes_init --&gt; routes_verify\n    routes_init --&gt; routes_sample\n    routes_init --&gt; routes_core\n    routes_init --&gt; services_verify\n    routes_sample --&gt; models\n    routes_sample --&gt; routes_core\n    routes_sample --&gt; components_sample_segments\n    routes_sample --&gt; services_verify\n    routes_verify --&gt; models\n    routes_verify --&gt; components_step_renderer\n    routes_verify --&gt; routes_core\n    routes_verify --&gt; services_verify\n    services_verify --&gt; models\n    services_verify --&gt; utils\n30 cross-module dependencies detected",
+    "crumbs": [
+      "cjm-transcript-verify"
+    ]
+  },
+  {
+    "objectID": "index.html#cli-reference",
+    "href": "index.html#cli-reference",
+    "title": "cjm-transcript-verify",
+    "section": "CLI Reference",
+    "text": "CLI Reference\nNo CLI commands found in this project.",
+    "crumbs": [
+      "cjm-transcript-verify"
+    ]
+  },
+  {
+    "objectID": "index.html#module-overview",
+    "href": "index.html#module-overview",
+    "title": "cjm-transcript-verify",
+    "section": "Module Overview",
+    "text": "Module Overview\nDetailed documentation for each module in the project:\n\ncore (core.ipynb)\n\nVerify step state management helpers for routes\n\n\nImport\nfrom cjm_transcript_verify.routes.core import (\n    WorkflowStateStore,\n    DEBUG_VERIFY_STATE,\n    VerifyContext\n)\n\n\nFunctions\ndef _get_verify_state(\n    state_store:WorkflowStateStore,  # The workflow state store\n    workflow_id:str,  # The workflow identifier\n    session_id:str  # Session identifier string\n) -&gt; VerifyStepState:  # Verify step state dictionary\n    \"Get the verify step state from the workflow state store.\"\ndef _get_review_state(\n    state_store:WorkflowStateStore,  # The workflow state store\n    workflow_id:str,  # The workflow identifier\n    session_id:str  # Session identifier string\n) -&gt; Dict[str, Any]:  # Review step state dictionary\n    \"Get the review step state (for document_id fallback).\"\ndef _load_verify_context(\n    state_store:WorkflowStateStore,  # The workflow state store\n    workflow_id:str,  # The workflow identifier\n    session_id:str  # Session identifier string\n) -&gt; VerifyContext:  # Common verify state values\n    \"Load commonly-needed verify state values with review fallback.\"\ndef _update_verify_state(\n    state_store:WorkflowStateStore,  # The workflow state store\n    workflow_id:str,  # The workflow identifier\n    session_id:str,  # Session identifier string\n    document_id:str=None,  # Document ID (None = don't change)\n    media_path:str=None,  # Media path (None = don't change)\n) -&gt; None\n    \"Update the verify step state in the workflow state store.\"\n\n\nClasses\nclass VerifyContext(NamedTuple):\n    \"Common verify state values loaded by handlers.\"\n\n\nVariables\nDEBUG_VERIFY_STATE = False\n\n\n\nhelpers (helpers.ipynb)\n\nState getters for the verify step from InteractionContext\n\n\nImport\nfrom cjm_transcript_verify.components.helpers import *\n\n\nFunctions\ndef _get_verify_state(\n    ctx:InteractionContext  # Interaction context with state\n) -&gt; VerifyStepState:  # Typed verify step state\n    \"Get the full verify step state from context.\"\ndef _get_document_id(\n    ctx:InteractionContext  # Interaction context with state\n) -&gt; Optional[str]:  # Document UUID or None if not set\n    \"Get the document ID to verify from context.\"\ndef _get_media_path(\n    ctx:InteractionContext  # Interaction context with state\n) -&gt; Optional[str]:  # Media path or None if not set\n    \"Get the media path for display context.\"\ndef _get_document_id_from_review(\n    ctx:InteractionContext  # Interaction context with state\n) -&gt; Optional[str]:  # Document UUID or None if not found\n    \"Get the document ID from review step state (fallback).\"\ndef _get_document_id_any(\n    ctx:InteractionContext  # Interaction context with state\n) -&gt; Optional[str]:  # Document UUID or None if not found anywhere\n    \"Get document ID from verify state, falling back to review state.\"\n\n\n\nhtml_ids (html_ids.ipynb)\n\nHTML ID constants for Phase 4: Verify\n\n\nImport\nfrom cjm_transcript_verify.html_ids import (\n    VerifyHtmlIds\n)\n\n\nClasses\nclass VerifyHtmlIds:\n    \"HTML ID constants for Phase 4: Verify.\"\n    \n    def as_selector(\n            id_str: str  # The HTML ID to convert\n        ) -&gt; str:  # CSS selector with # prefix\n        \"Convert an ID to a CSS selector format.\"\n\n\n\ninit (init.ipynb)\n\nRouter assembly for Phase 4 verify routes\n\n\nImport\nfrom cjm_transcript_verify.routes.init import (\n    init_verify_routers\n)\n\n\nFunctions\ndef init_verify_routers(\n    state_store:WorkflowStateStore,  # The workflow state store\n    workflow_id:str,  # The workflow identifier\n    prefix:str,  # Base prefix for verify routes (e.g., \"/workflow/verify\")\n    verify_service:VerifyService,  # Service for graph queries\n) -&gt; Tuple[List[APIRouter], VerifyUrls, Dict[str, Callable]]:  # (routers, urls, routes)\n    \"Initialize and return all verify routers with URL bundle.\"\n\n\n\nintegrity_checks (integrity_checks.ipynb)\n\nIntegrity check display with pass/fail indicators\n\n\nImport\nfrom cjm_transcript_verify.components.integrity_checks import (\n    render_integrity_checks\n)\n\n\nFunctions\ndef _render_check_row(\n    passed:bool,  # Whether the check passed\n    label:str,  # Check description\n    detail:str=\"\",  # Optional detail (e.g., \"246/246\")\n) -&gt; Any:  # Check row element\n    \"Render an integrity check row with pass/fail icon.\"\ndef render_integrity_checks(\n    result:VerificationResult,  # Verification result with integrity data\n) -&gt; Any:  # Integrity checks card\n    \"Render the structure integrity checks section.\"\n\n\n\nmodels (models.ipynb)\n\nVerify step state and verification result models for Phase 4: Verify\n\n\nImport\nfrom cjm_transcript_verify.models import (\n    VerifyStepState,\n    SegmentSample,\n    VerificationResult,\n    VerifyUrls\n)\n\n\nClasses\nclass VerifyStepState(TypedDict):\n    \"State for Phase 4: Verify.\"\n@dataclass\nclass SegmentSample:\n    \"Lightweight segment data for sample display.\"\n    \n    index: int  # Segment index in document\n    text: str  # Truncated text (~60 chars)\n    start_time: Optional[float]  # Start time in seconds\n    end_time: Optional[float]  # End time in seconds\n    \n    def duration(self) -&gt; Optional[float]:  # Computed duration in seconds\n            \"\"\"Compute duration from start and end times.\"\"\"\n            if self.start_time is not None and self.end_time is not None\n        \"Compute duration from start and end times.\"\n    \n    def to_dict(self) -&gt; dict:  # Serializable dictionary\n            \"\"\"Convert to dictionary for serialization.\"\"\"\n            return {\n                \"index\": self.index,\n        \"Convert to dictionary for serialization.\"\n    \n    def from_dict(cls, data: dict) -&gt; \"SegmentSample\":  # Reconstructed instance\n        \"Create from dictionary.\"\n@dataclass\nclass VerificationResult:\n    \"Complete verification data from graph database queries.\"\n    \n    document_id: str  # UUID of Document node\n    document_title: str  # Document title\n    document_media_type: str  # Media type ('audio', 'video', 'text')\n    segment_count: int  # Total number of segments\n    total_duration: float  # Total duration in seconds\n    avg_segment_duration: float  # Average segment duration in seconds\n    has_starts_with: bool  # Whether STARTS_WITH edge exists\n    starts_with_count: int  # Number of STARTS_WITH edges (should be 1)\n    next_chain_complete: bool  # Whether NEXT chain is complete\n    next_count: int  # Number of NEXT edges (should be segment_count - 1)\n    part_of_complete: bool  # Whether all PART_OF edges exist\n    part_of_count: int  # Number of PART_OF edges (should be segment_count)\n    all_have_timing: bool  # Whether all segments have timing\n    segments_missing_timing: int  # Count of segments without timing\n    all_have_sources: bool  # Whether all segments have sources\n    segments_missing_sources: int  # Count of segments without sources\n    source_plugins: List[str] = field(...)  # Unique plugin names\n    first_segments: List[SegmentSample] = field(...)  # First 3 segments\n    last_segments: List[SegmentSample] = field(...)  # Last 3 segments\n    \n    def all_checks_passed(self) -&gt; bool:  # Whether all integrity checks passed\n            \"\"\"Check if all integrity checks passed.\"\"\"\n            return (\n                self.has_starts_with and\n                self.starts_with_count == 1 and\n                self.next_chain_complete and\n                self.part_of_complete and\n                self.all_have_timing and\n                self.all_have_sources\n            )\n        \n        def to_dict(self) -&gt; dict:  # Serializable dictionary\n        \"Check if all integrity checks passed.\"\n    \n    def to_dict(self) -&gt; dict:  # Serializable dictionary\n            \"\"\"Convert to dictionary for serialization.\"\"\"\n            return {\n                \"document_id\": self.document_id,\n        \"Convert to dictionary for serialization.\"\n    \n    def from_dict(cls, data: dict) -&gt; \"VerificationResult\":  # Reconstructed instance\n        \"Create from dictionary.\"\n@dataclass\nclass VerifyUrls:\n    \"URL bundle for Phase 4 verify route handlers.\"\n    \n    verify: str = ''  # Main verification computation route\n    sample: str = ''  # Jump-to-index sample fetch route\n\n\n\nsample (sample.ipynb)\n\nJump-to-index route for fetching a single segment by index\n\n\nImport\nfrom cjm_transcript_verify.routes.sample import (\n    DEBUG_SAMPLE_ROUTES,\n    init_sample_router\n)\n\n\nFunctions\ndef init_sample_router(\n    state_store:WorkflowStateStore,  # The workflow state store\n    workflow_id:str,  # The workflow identifier\n    prefix:str,  # Route prefix (e.g., \"/workflow/verify\")\n    verify_service:VerifyService,  # Service for graph queries\n    urls:VerifyUrls,  # URL bundle (will be populated)\n) -&gt; Tuple[APIRouter, Dict[str, Callable]]:  # (router, routes dict)\n    \"Initialize sample route for jump-to-index segment fetching.\"\n\n\nVariables\nDEBUG_SAMPLE_ROUTES = False\n\n\n\nsample_segments (sample_segments.ipynb)\n\nSample segment display with first/last segments and jump-to-index\n\n\nImport\nfrom cjm_transcript_verify.components.sample_segments import (\n    render_sample_row,\n    render_sample_list,\n    render_jump_to_index,\n    render_jump_result,\n    render_sample_segments\n)\n\n\nFunctions\ndef render_sample_row(\n    sample:SegmentSample,  # Segment sample to display\n) -&gt; Any:  # Sample row element\n    \"Render a single segment sample row.\"\ndef render_sample_list(\n    samples:List[SegmentSample],  # Samples to display\n    label:str,  # Label for this list (e.g., \"First\", \"Last\")\n    container_id:str=\"\",  # Optional container ID\n) -&gt; Any:  # Sample list element\n    \"Render a list of segment samples with label.\"\ndef render_jump_to_index(\n    urls:VerifyUrls=None,  # URL bundle for routes\n    max_index:int=0,  # Maximum valid index for placeholder\n) -&gt; Any:  # Jump-to-index form with loading indicator\n    \"Render the jump-to-index input form with loading state.\"\ndef render_jump_result(\n    sample:Optional[SegmentSample]=None,  # Fetched sample or None\n    error:str=\"\",  # Error message if any\n) -&gt; Any:  # Jump result display\n    \"Render the jump-to-index result (single segment or error).\"\ndef render_sample_segments(\n    result:VerificationResult,  # Verification result with samples\n    urls:VerifyUrls=None,  # URL bundle for routes\n) -&gt; Any:  # Sample segments card\n    \"Render the full sample segments section.\"\n\n\n\nstep_renderer (step_renderer.ipynb)\n\nMain verify step renderer combining all dashboard components\n\n\nImport\nfrom cjm_transcript_verify.components.step_renderer import (\n    DEBUG_VERIFY_RENDER,\n    render_verify_header,\n    render_verify_error,\n    render_verify_loading,\n    render_verify_step\n)\n\n\nFunctions\ndef render_verify_header(\n    all_passed:bool,  # Whether all integrity checks passed\n) -&gt; Any:  # Header element with title and status badge\n    \"Render the verify step header with status badge.\"\ndef render_verify_error(\n    message:str=\"Unable to load verification data\",  # Error message\n) -&gt; Any:  # Error display element\n    \"Render an error state for the verify step.\"\ndef render_verify_loading() -&gt; Any:  # Loading indicator\n    \"Render a loading state for the verify step.\"\ndef render_verify_step(\n    result:Optional[VerificationResult]=None,  # Verification result or None for error\n    urls:VerifyUrls=None,  # URL bundle for routes\n    error:str=\"\",  # Error message if result is None\n) -&gt; Any:  # Complete verify step component\n    \"Render the complete verify step with all dashboard components.\"\n\n\nVariables\nDEBUG_VERIFY_RENDER = False\n\n\n\nutils (utils.ipynb)\n\nFormatting utilities for verification display\n\n\nImport\nfrom cjm_transcript_verify.utils import (\n    format_duration_mmss,\n    format_duration_seconds,\n    format_time_range,\n    truncate_text\n)\n\n\nFunctions\ndef format_duration_mmss(\n    seconds: Optional[float]  # Duration in seconds\n) -&gt; str:  # Formatted string (mm:ss)\n    \"Format duration in seconds as mm:ss for summary display.\"\ndef format_duration_seconds(\n    seconds: Optional[float]  # Duration in seconds\n) -&gt; str:  # Formatted string (e.g., \"10.3s\")\n    \"Format duration in seconds as Xs or X.Xs for average display.\"\ndef format_time_range(\n    start: Optional[float],  # Start time in seconds\n    end: Optional[float]  # End time in seconds\n) -&gt; str:  # Formatted range (e.g., \"0.0s - 2.1s\")\n    \"Format time range for sample segment display.\"\ndef truncate_text(\n    text: Optional[str],  # Full text to truncate\n    max_length: int = 60  # Maximum length before truncation\n) -&gt; str:  # Truncated text with ellipsis if needed\n    \"Truncate text for sample segment display.\"\n\n\n\nverification_summary (verification_summary.ipynb)\n\nSummary cards for document info, segments stats, and source info\n\n\nImport\nfrom cjm_transcript_verify.components.verification_summary import (\n    render_document_section,\n    render_segments_section,\n    render_sources_section,\n    render_verification_summary\n)\n\n\nFunctions\ndef _render_stat_row(\n    label:str,  # Label text\n    value:str,  # Value text\n) -&gt; Any:  # Stat row element\n    \"Render a label-value row for summary display.\"\ndef _render_section_header(\n    icon:Any,  # Lucide icon component\n    title:str,  # Section title\n) -&gt; Any:  # Section header element\n    \"Render a section header with icon.\"\ndef render_document_section(\n    result:VerificationResult,  # Verification result with document info\n) -&gt; Any:  # Document info card\n    \"Render the document info section.\"\ndef render_segments_section(\n    result:VerificationResult,  # Verification result with segment stats\n) -&gt; Any:  # Segments stats card\n    \"Render the segments statistics section.\"\ndef render_sources_section(\n    result:VerificationResult,  # Verification result with source info\n) -&gt; Any:  # Sources info card\n    \"Render the source traceability section.\"\ndef render_verification_summary(\n    result:VerificationResult,  # Verification result to display\n) -&gt; Any:  # Summary section with all info cards\n    \"Render the full verification summary with document, segments, and sources.\"\n\n\n\nverify (verify.ipynb)\n\nVerification route that queries graph and computes results\n\n\nImport\nfrom cjm_transcript_verify.routes.verify import (\n    DEBUG_VERIFY_ROUTES,\n    init_verify_router\n)\n\n\nFunctions\ndef init_verify_router(\n    state_store:WorkflowStateStore,  # The workflow state store\n    workflow_id:str,  # The workflow identifier\n    prefix:str,  # Route prefix (e.g., \"/workflow/verify\")\n    verify_service:VerifyService,  # Service for graph queries\n    urls:VerifyUrls,  # URL bundle (will be populated)\n) -&gt; Tuple[APIRouter, Dict[str, Callable]]:  # (router, routes dict)\n    \"Initialize verify route that computes verification results.\"\n\n\nVariables\nDEBUG_VERIFY_ROUTES = False\n\n\n\nservices.verify (verify.ipynb)\n\nService layer for querying graph database and computing verification results\n\n\nImport\nfrom cjm_transcript_verify.services.verify import (\n    DEBUG_VERIFY_SERVICE,\n    VerifyService\n)\n\n\nClasses\nclass VerifyService:\n    def __init__(\n        self,\n        plugin_manager: PluginManager,  # Plugin manager for accessing graph plugin\n        plugin_name: str = \"cjm-graph-plugin-sqlite\",  # Name of the graph plugin\n    )\n    \"Service for querying graph database and computing verification results.\"\n    \n    def __init__(\n            self,\n            plugin_manager: PluginManager,  # Plugin manager for accessing graph plugin\n            plugin_name: str = \"cjm-graph-plugin-sqlite\",  # Name of the graph plugin\n        )\n        \"Initialize with plugin manager.\"\n    \n    def is_available(self) -&gt; bool:  # True if plugin is loaded and ready\n            \"\"\"Check if the graph plugin is available.\"\"\"\n            return self._manager.get_plugin(self._plugin_name) is not None\n        \n        async def _get_context_async(\n            self,\n            node_id: str,  # UUID of the node to query\n            depth: int = 1,  # Traversal depth\n        ) -&gt; Optional[GraphContext]:  # GraphContext or None if error\n        \"Check if the graph plugin is available.\"\n    \n    async def verify_document_async(\n            self,\n            document_id: str,  # UUID of the Document node to verify\n        ) -&gt; Optional[VerificationResult]:  # Verification results or None if error/not found\n        \"Query graph and compute verification results for a document.\"\n    \n    def verify_document(\n            self,\n            document_id: str,  # UUID of the Document node to verify\n        ) -&gt; Optional[VerificationResult]:  # Verification results or None if error/not found\n        \"Query graph and compute verification results for a document synchronously.\"\n    \n    async def get_segment_by_index_async(\n            self,\n            document_id: str,  # UUID of the Document node\n            index: int,  # Segment index to fetch\n        ) -&gt; Optional[SegmentSample]:  # Segment sample or None if error/not found\n        \"Fetch a single segment by index for jump-to-index feature.\"\n    \n    def get_segment_by_index(\n            self,\n            document_id: str,  # UUID of the Document node\n            index: int,  # Segment index to fetch\n        ) -&gt; Optional[SegmentSample]:  # Segment sample or None if error/not found\n        \"Fetch a single segment by index for jump-to-index feature synchronously.\"\n    \n    async def get_segment_count_async(\n            self,\n            document_id: str,  # UUID of the Document node\n        ) -&gt; int:  # Number of segments or 0 if error\n        \"Get total segment count for index validation.\"\n    \n    def get_segment_count(\n            self,\n            document_id: str,  # UUID of the Document node\n        ) -&gt; int:  # Number of segments or 0 if error\n        \"Get total segment count for index validation synchronously.\"\n\n\nVariables\nDEBUG_VERIFY_SERVICE = False  # Enable for verbose graph query logging",
+    "crumbs": [
+      "cjm-transcript-verify"
+    ]
+  },
+  {
+    "objectID": "utils.html",
+    "href": "utils.html",
+    "title": "utils",
+    "section": "",
+    "text": "source\n\n\n\ndef format_duration_mmss(\n    seconds:Optional, # Duration in seconds\n)-&gt;str: # Formatted string (mm:ss)\n\nFormat duration in seconds as mm:ss for summary display.\n\nassert format_duration_mmss(0.0) == \"0:00\"\nassert format_duration_mmss(65.5) == \"1:05\"\nassert format_duration_mmss(2537.0) == \"42:17\"\nassert format_duration_mmss(None) == \"--:--\"\nprint(\"format_duration_mmss tests passed\")\n\n\nsource\n\n\n\n\ndef format_duration_seconds(\n    seconds:Optional, # Duration in seconds\n)-&gt;str: # Formatted string (e.g., \"10.3s\")\n\nFormat duration in seconds as Xs or X.Xs for average display.\n\nassert format_duration_seconds(10.3) == \"10.3s\"\nassert format_duration_seconds(0.0) == \"0.0s\"\nassert format_duration_seconds(65.25) == \"65.2s\"\nassert format_duration_seconds(None) == \"-.-s\"\nprint(\"format_duration_seconds tests passed\")\n\n\nsource\n\n\n\n\ndef format_time_range(\n    start:Optional, # Start time in seconds\n    end:Optional, # End time in seconds\n)-&gt;str: # Formatted range (e.g., \"0.0s - 2.1s\")\n\nFormat time range for sample segment display.\n\nassert format_time_range(0.0, 2.1) == \"0.0s - 2.1s\"\nassert format_time_range(2512.0, 2537.0) == \"2512.0s - 2537.0s\"\nassert format_time_range(None, 2.1) == \"-.-s - -.-s\"\nprint(\"format_time_range tests passed\")",
+    "crumbs": [
+      "utils"
+    ]
+  },
+  {
+    "objectID": "utils.html#duration-formatting",
+    "href": "utils.html#duration-formatting",
+    "title": "utils",
+    "section": "",
+    "text": "source\n\n\n\ndef format_duration_mmss(\n    seconds:Optional, # Duration in seconds\n)-&gt;str: # Formatted string (mm:ss)\n\nFormat duration in seconds as mm:ss for summary display.\n\nassert format_duration_mmss(0.0) == \"0:00\"\nassert format_duration_mmss(65.5) == \"1:05\"\nassert format_duration_mmss(2537.0) == \"42:17\"\nassert format_duration_mmss(None) == \"--:--\"\nprint(\"format_duration_mmss tests passed\")\n\n\nsource\n\n\n\n\ndef format_duration_seconds(\n    seconds:Optional, # Duration in seconds\n)-&gt;str: # Formatted string (e.g., \"10.3s\")\n\nFormat duration in seconds as Xs or X.Xs for average display.\n\nassert format_duration_seconds(10.3) == \"10.3s\"\nassert format_duration_seconds(0.0) == \"0.0s\"\nassert format_duration_seconds(65.25) == \"65.2s\"\nassert format_duration_seconds(None) == \"-.-s\"\nprint(\"format_duration_seconds tests passed\")\n\n\nsource\n\n\n\n\ndef format_time_range(\n    start:Optional, # Start time in seconds\n    end:Optional, # End time in seconds\n)-&gt;str: # Formatted range (e.g., \"0.0s - 2.1s\")\n\nFormat time range for sample segment display.\n\nassert format_time_range(0.0, 2.1) == \"0.0s - 2.1s\"\nassert format_time_range(2512.0, 2537.0) == \"2512.0s - 2537.0s\"\nassert format_time_range(None, 2.1) == \"-.-s - -.-s\"\nprint(\"format_time_range tests passed\")",
+    "crumbs": [
+      "utils"
+    ]
+  },
+  {
+    "objectID": "utils.html#text-formatting",
+    "href": "utils.html#text-formatting",
+    "title": "utils",
+    "section": "Text Formatting",
+    "text": "Text Formatting\n\nsource\n\ntruncate_text\n\ndef truncate_text(\n    text:Optional, # Full text to truncate\n    max_length:int=60, # Maximum length before truncation\n)-&gt;str: # Truncated text with ellipsis if needed\n\nTruncate text for sample segment display.\n\nassert truncate_text(\"Short text\") == \"Short text\"\nassert truncate_text(\"A\" * 60) == \"A\" * 60\nassert truncate_text(\"A\" * 70) == \"A\" * 57 + \"...\"\nassert truncate_text(None) == \"\"\nassert truncate_text(\"Hello world\", max_length=8) == \"Hello...\"\nprint(\"truncate_text tests passed\")",
+    "crumbs": [
+      "utils"
+    ]
+  }
+]
